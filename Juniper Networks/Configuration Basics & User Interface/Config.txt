@@ -1,0 +1,46 @@
+Root setup (Pa$$w0rd)
+==================================================
+set system root-authentication encrypted-password "$1$pW.aob99$3CWqRk6.eOy5sRjnNqymk0"
+
+Interfaces & Connectivity
+==================================================
+
+delete security zones security-zone untrust interfaces ge-0/0/0.0
+
+edit security zones security-zone trust 
+set interfaces ge-0/0/0.0 host-inbound-traffic system-services https
+set interfaces ge-0/0/0.0 host-inbound-traffic system-services ssh
+
+top
+
+set interfaces ge-0/0/0.0 family inet address 10.0.0.1/24
+
+Basic Configuration
+==================================================
+edit system services web-management
+ delete
+ set https system-generated-certificate port 443 interface ge-0/0/0.0
+
+Help
+==================================================
+help apropos
+help topic
+
+Commit and Rollback
+==================================================
+commit check
+commit confirmed
+commit comment CHANGE_MADE
+
+show | compare rollback 0
+show | compare rollback 1
+
+show system commit
+show system rollback 0 compare 1
+
+Output Filtering
+==================================================
+show | display set
+show | match 
+show | find 
+show | save
