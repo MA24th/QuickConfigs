@@ -1,0 +1,20 @@
+CR1
+!-----------------------!
+router ospf 1
+ router-id 0.0.0.1 
+
+interface gi0/0
+ ip address 10.0.12.1 255.255.255.0
+ ip ospf 1 area 0
+ no shutdown
+ 
+interface se1/0
+ ip address 10.0.13.1 255.255.255.0
+ ip ospf 1 area 13
+ no shutdown
+
+!-----------------------! 
+router ospf 1 
+ area 13 range 3.3.3.0 255.255.255.252
+ area 13 range 3.3.3.0 255.255.255.252 cost 0
+ area 13 range 3.3.3.0 255.255.255.252 not-advertise 
