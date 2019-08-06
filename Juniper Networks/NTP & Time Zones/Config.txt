@@ -1,0 +1,21 @@
+Manual Time and Date
+==================================================
+set date 201605201900.00
+
+Format = YYYYMMDDhhmm.ss
+
+set date ntp 0.au.pool.ntp.org
+
+NTP & Timezones
+==================================================
+set system ntp server 0.au.pool.ntp.org
+set system ntp server 1.au.pool.ntp.org
+set system ntp server 2.au.pool.ntp.org
+set system ntp server 3.au.pool.ntp.org
+
+set system time-zone GMT+10
+set system time-zone Australia/Sydney
+ 
+show system uptime
+show ntp associations no-resolve
+show ntp status
