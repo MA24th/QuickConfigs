@@ -1,0 +1,29 @@
+CR3
+!-----------------------!
+ipv6 unicast-routing
+!
+interface se1/0
+ encapsulation frame-relay
+ no frame-relay inverse-arp
+ no shutdown
+!
+interface se1/0.123 point-to-point
+ no frame-relay inverse-arp
+ frame-relay interface-dlci 301 
+ ip address 10.0.123.3 255.255.255.0
+
+ ipv6 address fe80::3 link-local
+ ipv6 address 2001:123::3/64
+ ipv6 rip RIPng enable
+ no shutdown
+!
+interface lo1
+ ip address 3.3.3.3 255.255.255.255
+ ipv6 address 3::3/128
+ ipv6 rip RIPng enable
+!
+router rip
+ version 2
+ no auto-summary
+ network 3.0.0.0
+ network 10.0.0.0

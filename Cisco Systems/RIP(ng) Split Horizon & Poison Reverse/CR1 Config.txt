@@ -1,0 +1,38 @@
+CR1
+!-----------------------!
+ipv6 unicast-routing
+!
+interface se1/0
+ encapsulation frame-relay
+ no frame-relay inverse-arp
+ no shutdown
+!
+int se1/0.123 multipoint
+ no frame-relay inverse-arp
+ frame-relay map ip 10.0.123.2 102 broadcast
+ frame-relay map ip 10.0.123.3 103 broadcast
+ frame-relay map ipv6 2001:123::2 102 
+ frame-relay map ipv6 2001:123::3 103 
+ frame-relay map ipv6 fe80::2 102 broadcast
+ frame-relay map ipv6 fe80::3 103 broadcast
+ 
+ ip address 10.0.123.1 255.255.255.0
+ ip split-horizon
+ ipv6 address fe80::1 link-local
+ ipv6 address 2001:123::1/64
+ ipv6 rip RIPng enable
+ 
+interface lo1
+ ip address 1.1.1.1 255.255.255.255
+ ipv6 address 1::1/128
+ ipv6 rip RIPng enable
+
+ipv6 router rip RIPng 
+ split-horizon 
+ poison-reverse
+
+router rip
+ version 2
+ no auto-summary
+ network 1.0.0.0
+ network 10.0.0.0
