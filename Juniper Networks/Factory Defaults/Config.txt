@@ -1,0 +1,20 @@
+Factory Default Configuration with Root
+==================================================
+load factory default
+set system root-authentication plain-text-password
+
+Factory Default Configuration without Root
+==================================================
+request system zeroize
+
+Root Password Recovery
+==================================================
+boot -s 
+recovery 
+
+Configuration Management
+==================================================
+save /root/file1.conf
+save /var/home/user/configurations/file2.conf
+
+load override
