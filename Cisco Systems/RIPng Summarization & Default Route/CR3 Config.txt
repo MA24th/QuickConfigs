@@ -1,0 +1,17 @@
+CR3
+!-----------------------!
+ipv6 unicast-routing
+!
+interface fa0/1
+ ipv6 address fe80::3 link-local
+ ipv6 rip RIPng enable
+ no shutdown
+!
+interface se1/0
+ ipv6 address fe80::3 link-local
+ ipv6 rip RIPng enable
+ no shutdown 
+!
+int lo1 
+ ipv6 address 3::3/128
+ ipv6 rip RIPng enable 
