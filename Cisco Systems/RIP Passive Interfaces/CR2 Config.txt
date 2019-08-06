@@ -1,0 +1,15 @@
+CR2
+!-----------------------!
+interface fa0/0
+ ip address 10.0.12.2 255.255.255.252
+ mac-address 0022.2222.22
+ no shutdown
+ 
+interface lo0
+ ip add 2.2.2.2 255.255.255.255
+
+router rip
+ version 2
+ no auto-summary
+ network 10.0.0.0
+ network 2.0.0.0
