@@ -1,0 +1,52 @@
+Basic SRX Config
+==================================================
+set system root-authentication encrypted-password "$1$4zHjLsyX$X61xzWZbSkPYer/d5M7zb1"
+set system services telnet
+
+set interfaces ge-0/0/0 unit 0 family inet address 2.0.0.1/24
+set interfaces ge-0/0/1 unit 0 family inet address 10.0.0.1/24
+set routing-options static route 0.0.0.0/0 next-hop 2.0.0.2
+
+edit security zones security-zone trust
+ delete
+ set interfaces ge-0/0/1.0
+edit security zones security-zone untrust 
+ delete
+ set interfaces ge-0/0/0.0 host-inbound-traffic system-services telnet
+
+Junos Applications
+==================================================
+show configuration groups junos-defaults applications application
+show configuration groups junos-defaults applications | match "icmp|ping" | display set
+
+Allow Applications
+==================================================
+edit security policies from-zone untrust to-zone trust 
+ set policy ALLOW_ADMIN match application junos-ping
+ set policy ALLOW_ADMIN match application junos-telnet
+ set policy ALLOW_ADMIN match application junos-ssh
+ set policy ALLOW_ADMIN match application junos-https
+ set policy ALLOW_ADMIN match source-address any
+ set policy ALLOW_ADMIN match destination-address any
+ set policy ALLOW_ADMIN then permit
+ 
+insert policy ALLOW_ADMIN before policy default-deny
+
+Define Application Sets
+==================================================
+set applications application TELNET protocol tcp
+set applications application TELNET destination-port 2000
+
+set applications application-set ADMIN_SET application junos-ssh
+set applications application-set ADMIN_SET application junos-https
+set applications application-set ADMIN_SET application junos-telnet
+set applications application-set ADMIN_SET application junos-ping
+set applications application-set ADMIN_SET application TELNET
+
+edit security policies from-zone untrust to-zone trust 
+ set policy ALLOW_ADMIN match application ADMIN_SET
+ set policy ALLOW_ADMIN match source-address any
+ set policy ALLOW_ADMIN match destination-address any
+ set policy ALLOW_ADMIN then permit
+ 
+insert policy ALLOW_ADMIN before policy default-deny
