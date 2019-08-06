@@ -1,0 +1,16 @@
+CR4
+!-----------------------!
+router ospf 1
+ router-id 0.0.0.4 
+
+interface gi0/0
+ ip address 10.0.0.4 255.255.255.0
+ ip ospf network non-broadcast
+ ip ospf 1 area 0
+ ip ospf priority 255
+ no shutdown
+ 
+router ospf 1
+ neighbor 10.0.0.1
+ neighbor 10.0.0.2
+ neighbor 10.0.0.3
