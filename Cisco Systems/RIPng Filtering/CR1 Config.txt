@@ -1,0 +1,18 @@
+CR1
+!-----------------------!
+ipv6 unicast-routing
+!
+interface fa0/0
+ ipv6 address fe80::1 link-local
+ ipv6 rip RIPng enable
+
+Filtering
+!-----------------------!
+ipv6 prefix-list L123 permit 2::/126 ge 128
+
+ipv6 prefix-list L1 deny 2::1/128
+ipv6 prefix-list L1 permit ::/0 le 128
+
+ipv6 router rip RIPng
+ distribute-list prefix-list L123 in
+ distribute-list prefix-list L1 in fa0/0
