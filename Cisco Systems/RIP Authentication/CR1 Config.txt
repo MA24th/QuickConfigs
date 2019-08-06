@@ -1,0 +1,21 @@
+CR1
+!-----------------------!
+key chain RIP
+ key 1
+  key-string cisco
+  
+interface fa0/0
+ ip address 10.0.12.1 255.255.255.252
+ mac-address 0011.1111.1111
+ no shutdown
+ ip rip authentication mode md5
+ ip rip authentication key-chain RIP
+
+interface lo0
+ ip add 1.1.1.1 255.255.255.255
+
+router rip
+ version 2
+ no auto-summary
+ network 10.0.0.0
+ network 1.0.0.0 
