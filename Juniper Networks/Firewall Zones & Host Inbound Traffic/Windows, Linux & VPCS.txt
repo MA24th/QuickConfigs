@@ -1,0 +1,19 @@
+Windows IPv4 Network Adapter
+==================================================
+Remove-NetIPAddress -InterfaceAlias Loopback
+New-NetIPAddress -InterfaceAlias Loopback –IPAddress 2.0.0.2 -PrefixLength 24
+
+netsh interface ip set address "Loopback" static 2.0.0.2 255.255.255.0
+
+Windows IPv4 Route
+==================================================
+route add 10.0.0.0 mask 255.255.255.0 2.0.0.1
+
+Linux IPv4 Config & Route
+==================================================
+ifconfig eth0 10.0.0.10/24
+route add -net 0.0.0.0 netmask 0.0.0.0 gw 10.0.0.1
+
+VPCS IPv4 Config & Route
+==================================================
+ip 10.0.0.10/24 10.0.0.1 

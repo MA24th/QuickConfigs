@@ -1,0 +1,25 @@
+Basic SRX Config
+==================================================
+set system services telnet
+
+set interfaces ge-0/0/0 unit 0 family inet address 2.0.0.1/24
+set interfaces ge-0/0/1 unit 0 family inet address 10.0.0.1/24
+set routing-options static route 0.0.0.0/0 next-hop 2.0.0.2
+
+Default Zone Assignment
+==================================================
+edit security zones security-zone untrust interfaces ge-0/0/0.0
+ delete
+ set host-inbound-traffic system-services ping
+
+edit security zones security-zone trust
+ set host-inbound-traffic system-services telnet
+ set host-inbound-traffic system-services ssh
+ set host-inbound-traffic system-services https
+ set host-inbound-traffic system-services ping
+ set interface ge-0/0/1
+ 
+Enable HTTPS Management
+==================================================
+edit system services web-management 
+ set https interface ge-0/0/0 system-generated-certificate
