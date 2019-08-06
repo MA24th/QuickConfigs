@@ -1,0 +1,43 @@
+Interfaces
+!-----------------------!
+set interfaces ge-0/0/1.0 family inet address 10.0.0.1/24
+set interfaces ge-0/0/0.0 family inet address 1.0.0.1/30
+
+Management Filter #1
+!-----------------------!
+set policy-options prefix-list TRUSTED 10.0.0.0/24
+
+edit firewall family inet filter MGMT
+ set term DENY_TCP from source-address 0.0.0.0/0
+ set term DENY_TCP from source-prefix-list TRUSTED except
+ set term DENY_TCP from protocol tcp
+ set term DENY_TCP from destination-port ssh
+ set term DENY_TCP from destination-port https
+ set term DENY_TCP then log
+ set term DENY_TCP then discard
+ 
+ set term DENY_UDP from source-address 0.0.0.0/0
+ set term DENY_UDP from source-prefix-list TRUSTED except
+ set term DENY_UDP from protocol udp
+ set term DENY_UDP from destination-port snmp
+ set term DENY_UDP then discard
+ 
+ set term PERMIT_OTHER then accept
+
+set interfaces lo0.0 family inet address 127.0.0.1/32
+set interfaces lo0.0 family inet filter input MGMT
+
+Security & Firewall
+!-----------------------!
+edit security zones
+ set security-zone trust interfaces ge-0/0/1.0
+ set security-zone trust host-inbound system-services all
+ set security-zone trust host-inbound protocols all
+ 
+ set security-zone untrust interfaces ge-0/0/0.0
+ set security-zone untrust host-inbound system-services ping
+
+Verify 
+!-----------------------!
+show firewall log
+show firewall filter MGMT
