@@ -1,0 +1,84 @@
+Windows & UniFi Installation
+!--------------------------!
+#Set static IP address
+#Install Java 8 RE
+
+Default installation directory:
+	%userprofile%\Ubiquiti UniFi
+
+(optional) Move UniFi location:
+	C:\Ubiquiti UniFi
+
+Option #1 Run on System Startup
+!-----------------------------!	
+#Create a local admin account for UniFi (recommended)
+
+#Open administrative command prompt (or use Control Panel)
+	net user /add unifiadmin *
+	net localgroup administrators unifiadmin /add
+
+#Create a scheduled task
+Task Scheduler > Create Basic Task
+Name:		UniFiBoot
+Trigger:	When the computer starts
+Action:		Start a program
+			
+Program/script:
+"%PROGRAMDATA%\Oracle\Java\javapath\javaw.exe"
+
+Arguments:
+C:\Ubiquiti UniFi\lib\ace.jar" ui
+
+#This argument assumes that you moved the install location to C:\Ubiquiti UniFi
+
+#Go to task properties
+General  : Change user account to other local admin
+General  : Run whether user is logged on or not
+General  : Run with the highest privileges
+Settings : Run task as soon as possible after a scheduled start is missed
+Settings : If task fails, restart every: ... minutes/times
+
+Option #2 Run UniFi as a Service
+!------------------------------!
+#Disable the scheduled task if created above
+#Open administrative command prompt
+	cd C:\Ubiquiti UniFi 
+	java -jar lib\ace.jar installsvc
+
+#These arguments assume that you moved the install location to C:\Ubiquiti UniFi
+
+#Change service parameters
+Start > run > services.msc
+Service: 		UniFi Controller
+Startup type: 	Automatic (should be default)
+Log on:			Change user account to other local admin
+
+#Reboot to start the service
+	
+Windows Firewall 
+!--------------!
+Option #1 Disable firewall
+Option #2 Leave default UniFi/Java firewall rules as is
+Option #3 Delete default firewall rules and create your own
+
+#Option 3
+Import-Module NetSecurity
+
+Remove-NetFirewallRule -DisplayName "UniFi DB Server"
+Remove-NetFirewallRule -DisplayName "Java (TM) Runtime Environment"
+
+New-NetFirewallRule -Name UniFiUDP -DisplayName UniFiUDP –LocalPort 3478,10001 -Protocol UDP -Profile Any -Direction Inbound -Action Allow
+
+New-NetFirewallRule -Name UniFiTCP -DisplayName UniFiTCP –LocalPort 8080,8880,8443,8843,27117 -Protocol TCP -Profile Any -Direction Inbound -Action Allow
+
+New-NetFirewallRule -Name AllowICMPv4 -DisplayName AllowICMPv4 -Protocol ICMPv4 -IcmpType 8 -Enabled True -Profile Any -Action Allow
+
+Firewall Ports
+!------------!
+TCP-8080	UAP > controller communication
+TCP-8443	Controller GUI / API
+TCP-8880	HTTP portal redirect
+TCP-8843	HTTPS portal redirect
+
+UDP-3478 	STUN
+UDP-10001	UBNT Discovery
