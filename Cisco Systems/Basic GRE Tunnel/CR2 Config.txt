@@ -1,0 +1,15 @@
+CR1
+!-----------------------!
+interface gi0/0
+ ip add 1.0.0.2 255.255.255.252
+ no shutdown
+
+interface tun0
+ ip add 10.0.12.2 255.255.255.252
+ tunnel source 1.0.0.2
+ tunnel destination 1.0.0.1
+ tunnel mode gre ip
+
+!-----------------------!
+interface tun0
+ ip ospf 1 area 12
