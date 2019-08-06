@@ -1,0 +1,19 @@
+CR2
+!-----------------------!
+router ospf 1
+ router-id 0.0.0.2
+
+interface gi0/0
+ ip address 10.0.0.2 255.255.255.0
+ ip ospf network point-to-multipoint non-broadcast
+ ip ospf 1 area 1234
+ no shutdown
+ 
+router ospf 1
+ neighbor 10.0.0.1
+ neighbor 10.0.0.3
+ neighbor 10.0.0.4
+ 
+interface lo1
+ ip add 2.2.2.2 255.255.255.255
+ ip ospf 1 area 0

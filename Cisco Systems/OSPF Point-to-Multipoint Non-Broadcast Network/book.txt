@@ -1,0 +1,26 @@
+sh ip ospf interface br
+	state f/c
+
+sh ip ospf interface
+	adjacency
+	timers
+	type
+sh ip ospf neighbor 
+	state
+	prio
+sh ip ospf database
+	link-id -> router-id
+	link count
+	
+sh ip ospf database router adv 0.0.0.1
+	stub
+	p2p
+sh ip ospf database router adv 0.0.0.5
+
+show ip ospf rib 
+	*
+	>
+show ip ospf rib 5.5.5.5
+	lsa/lsid/adv-rid
+
+wireshark
