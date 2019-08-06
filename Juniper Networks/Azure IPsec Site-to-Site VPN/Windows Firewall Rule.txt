@@ -1,0 +1,6 @@
+Import-Module NetSecurity
+New-NetFirewallRule -Name Allow_ICMP -DisplayName “Allow ICMPv4” -Protocol ICMPv4 -IcmpType 8 -Enabled True -Profile Any -Action Allow
+
+|-----------------------------------------------------|
+
+netsh advfirewall firewall add rule name="Allow ICMPv4" dir=in action=allow protocol=icmpv4

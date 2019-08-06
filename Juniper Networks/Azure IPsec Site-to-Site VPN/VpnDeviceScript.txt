@@ -1,0 +1,43 @@
+set security ike proposal azure-proposal authentication-method pre-shared-keys
+set security ike proposal azure-proposal authentication-algorithm sha1
+set security ike proposal azure-proposal encryption-algorithm aes-256-cbc
+set security ike proposal azure-proposal lifetime-seconds 28800
+set security ike proposal azure-proposal dh-group group2
+set security ike policy azure-policy mode main
+set security ike policy azure-policy proposals azure-proposal
+set security ike policy azure-policy pre-shared-key ascii-text jovIDqrG21eKmkdRBr341H1dgoW0mCbu
+set security ike gateway azure-gateway ike-policy azure-policy
+set security ike gateway azure-gateway address 13.70.91.29
+set security ike gateway azure-gateway external-interface <NameOfYourOutsideInterface>
+
+set security ipsec proposal azure-ipsec-proposal protocol esp
+set security ipsec proposal azure-ipsec-proposal authentication-algorithm  hmac-sha1-96
+set security ipsec proposal azure-ipsec-proposal encryption-algorithm aes-256-cbc
+set security ipsec proposal azure-ipsec-proposal lifetime-seconds 3600
+set security ipsec policy azure-vpn-policy proposals azure-ipsec-proposal
+set security ipsec vpn azure-ipsec-vpn ike gateway azure-gateway
+set security ipsec vpn azure-ipsec-vpn ike ipsec-policy azure-vpn-policy
+
+set security zones security-zone trust interfaces <NameOfYourInsideInterface>
+set security zones security-zone trust host-inbound-traffic system-services ike
+set security zones security-zone trust address-book address onprem-networks-1 192.168.1.0/24
+
+set security zones security-zone untrust interfaces <NameOfYourOutsideInterface>
+set security zones security-zone untrust host-inbound-traffic system-services ike
+set security zones security-zone untrust address-book address azure-networks-1 10.0.0.0/21
+
+set security policies from-zone trust to-zone untrust policy azure-security-trust-to-untrust-0 match source-address onprem-networks-1
+set security policies from-zone trust to-zone untrust policy azure-security-trust-to-untrust-0 match destination-address azure-networks-1
+set security policies from-zone trust to-zone untrust policy azure-security-trust-to-untrust-0 match application any
+set security policies from-zone trust to-zone untrust policy azure-security-trust-to-untrust-0 then permit tunnel ipsec-vpn azure-ipsec-vpn
+set security policies from-zone trust to-zone untrust policy azure-security-trust-to-untrust-0 then permit tunnel pair-policy azure-security-untrust-to-trust-0
+
+set security policies from-zone untrust to-zone trust policy azure-security-untrust-to-trust-0 match source-address azure-networks-1
+set security policies from-zone untrust to-zone trust policy azure-security-untrust-to-trust-0 match destination-address onprem-networks-1
+set security policies from-zone untrust to-zone trust policy azure-security-untrust-to-trust-0 match application any
+set security policies from-zone untrust to-zone trust policy azure-security-untrust-to-trust-0 then permit tunnel ipsec-vpn azure-ipsec-vpn
+set security policies from-zone untrust to-zone trust policy azure-security-untrust-to-trust-0 then permit tunnel pair-policy azure-security-trust-to-untrust-0
+
+insert security policies from-zone trust to-zone untrust policy azure-security-trust-to-untrust-0 before policy 
+set security flow tcp-mss ipsec-vpn mss 1350
+
