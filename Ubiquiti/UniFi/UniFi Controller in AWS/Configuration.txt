@@ -1,0 +1,118 @@
+AWS Launch Instance
+!------------------!
+1. Services > Compute EC2 > Launch Instance
+   Ubuntu Server 16.04 LTS (HVM), SSD Volume Type
+
+2. General Purpose > t2-micro (Free tier eligible)
+
+3. Add storage (30 GB)
+
+4. Review and Launch
+
+5. Security Groups >  Edit security groups
+   
+TCP-22		SSH
+TCP-8080	UAP > controller communication
+TCP-8443	Controller GUI / API
+TCP-8880	HTTP portal redirect
+TCP-8843	HTTPS portal redirect
+UDP-3478 	STUN
+
+Allow the above from either:
+   Anywhere 
+   Custom range 
+   My IP
+
+6. Launch Instance
+   Create a new key pair or use exisiting
+   Download key pair
+
+7. Assign Elastic IP (static)
+   Services > Network & security > Elastic IPs
+   Allocate new address > VPC
+   Associate address > link to Ubuntu Server Instance
+   
+7. Connect to server using SSH and your key pair
+   Use public DNS provided by AWS > description of Instance
+   Add public key to SSH client of your choice
+   Username in case of Ubuntu Server is ubuntu
+   No password needed
+
+Ubuntu Server Installation
+!------------------------!
+apt-get install apt-transport-https
+
+Verify Ubuntu Installation
+!------------------------!
+#Verify networking
+#Verify ntp & timezones
+
+timedatectl status
+timedatectl set-timezone Europe/Amsterdam
+
+#Verify sudoers / root
+
+cut -d: -f1 /etc/passwd
+
+#Update & upgrade
+
+apt-get update
+apt-get upgrade
+
+UniFi Installation
+!----------------!
+nano /etc/apt/sources.list
+#UniFi
+deb http://www.ubnt.com/downloads/unifi/debian stable ubiquiti
+
+tail /etc/apt/sources.list
+
+apt-key adv --keyserver keyserver.ubuntu.com --recv C0A52C50
+
+apt-get update
+
+apt-get install unifi
+
+Verify UniFi Installation
+!-----------------------!
+systemctl status unifi
+
+https://amazonpublicdns....:8443
+
+(Optional) Disable UniFi Update
+!-----------------------!
+apt-mark hold unifi
+
+dpkg -l | grep unifi
+
+apt-mark unhold unifi
+
+Layer 3 (L3) Device Adoption
+!--------------------------!
+Install UniFi Discovery Utility on local PC
+Discover APs/devices
+manage > set url to http://aws-elastic-ip:8080/inform
+	     set username/password to ubnt/ubnt
+
+See my 'Layer 3 Device Adoption Methods' video/config file for other options
+		 
+(Optional) Install Webmin
+!-----------------------!
+nano /etc/apt/sources.list
+#Webmin
+deb http://download.webmin.com/download/repository sarge contrib
+deb http://webmin.mirror.somersettechsolutions.co.uk/repository sarge contrib
+
+wget http://www.webmin.com/jcameron-key.asc
+
+apt-key add jcameron-key.asc
+
+apt-get update
+
+apt-get install webmin
+
+Optional (Verify Webmin)
+!-----------------------!
+systemctl status webmin
+
+https://192.168.1.199:10000
