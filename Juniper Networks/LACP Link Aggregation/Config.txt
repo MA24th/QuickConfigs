@@ -1,0 +1,18 @@
+LACP Link Aggregation
+==================================================
+set chassis aggregated-devices ethernet device-count 1
+
+edit interfaces
+ delete fe-0/0/1 unit 0
+ delete fe-0/0/2 unit 0
+ 
+ set fe-0/0/1 fastether-options 802.3ad ae0
+ set fe-0/0/2 fastether-options 802.3ad ae0
+ 
+ set ae0 unit 0 family inet address 10.0.12.2/30
+ set ae0 aggregated-ether-options lacp active
+
+edit security zones security-zone trust
+ delete interfaces fe-0/0/1.0
+ delete interfaces fe-0/0/2.0
+ set interfaces ae0.0
