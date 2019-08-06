@@ -1,0 +1,16 @@
+CR1
+!-----------------------!
+router ospf 1
+ router-id 0.0.0.1 
+ network 10.0.12.0 0.0.0.255 area 21
+ network 10.0.12.0 0.0.0.3 area 12
+ 
+interface fa0/0
+ ip address 10.0.12.1 255.255.255.252
+ ip ospf network broadcast
+ ip ospf 1 area 0
+ ip ospf priority 0
+ ip ospf hello-interval 10
+ ip ospf dead-interval 90
+ ip mtu 1500
+ no shutdown
