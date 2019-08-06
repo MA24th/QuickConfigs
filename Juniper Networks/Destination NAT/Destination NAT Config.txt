@@ -1,0 +1,40 @@
+Interfaces
+!-----------------------!
+set interfaces ge-0/0/1.0 family inet address 10.0.0.1/24
+set interfaces ge-0/0/0.0 family inet address 1.0.0.1/30
+
+Define Applications
+!-----------------------!
+set applications application RDP_TCP protocol tcp
+set applications application RDP_TCP destination-port 3389
+set applications application RDP_UDP protocol udp
+set applications application RDP_UDP destination-port 3389
+
+set security nat proxy-arp interface ge-0/0/0.0 address 1.0.0.10
+
+1:1 Destination NAT
+!-----------------------!
+set security nat destination pool SERVER1_3389 address 10.0.0.100/32
+set security nat destination pool SERVER1_3389 address port 3389
+
+set security nat destination rule-set DNAT rule 1 match destination-address 1.0.0.10/32
+set security nat destination rule-set DNAT rule 1 match destination-port 33890
+set security nat destination rule-set DNAT rule 1 then destination-nat pool 100_3389
+
+Security & Firewall
+!-----------------------!
+edit security zones
+ set security-zone trust interfaces ge-0/0/1.0
+ set security-zone trust host-inbound system-services all
+ set security-zone trust host-inbound protocols all
+ set security-zone trust address-book address SERVER1 10.0.0.100/32
+ 
+ set security-zone untrust interfaces ge-0/0/0.0
+ set security-zone untrust host-inbound system-services ping
+
+edit security policies from-zone untrust to-zone trust
+ set policy RDP_POLICY match source-address any
+ set policy RDP_POLICY match destination-address SERVER1
+ set policy RDP_POLICY match application RDP_TCP
+ set policy RDP_POLICY match application RDP_UDP
+ set policy RDP_POLICY then permit
