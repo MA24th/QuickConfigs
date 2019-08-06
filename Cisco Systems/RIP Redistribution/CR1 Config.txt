@@ -1,0 +1,29 @@
+CR1
+!-----------------------!
+interface fa0/0
+ ip address 10.0.12.1 255.255.255.0
+ no shutdown
+
+interface se1/0
+ ip address 172.16.13.1 255.255.255.0
+ ip ospf cost 1
+ no shutdown 
+ 
+router rip
+ version 2
+ no auto-summary
+ network 10.0.0.0
+ 
+router ospf 13
+ router-id 0.0.0.1
+ network 172.16.13.0 0.0.0.255 area 13
+ 
+!-----------------------!
+ip prefix-list L1 permit 3.3.3.1/32 
+route-map LOOP permit 10
+ match ip address prefix-list L1
+ 
+router rip 
+ redistribute ospf 13 metric 0
+ redistribute ospf 13 metric transparent
+ redistribute ospf 13 metric transparent route-map LOOP

@@ -1,0 +1,27 @@
+CR3
+!-----------------------!
+interface se1/0
+ ip address 172.16.13.3 255.255.255.0
+ no shutdown
+ 
+interface lo1
+ ip add 3.3.3.1 255.255.255.255
+interface lo2
+ ip add 3.3.3.2 255.255.255.255
+interface lo3
+ ip add 3.3.3.3 255.255.255.255
+
+route-map LOOP permit 10
+ match interface lo1
+ set metric 12
+route-map LOOP permit 20
+ match interface lo2
+ set metric 13
+route-map LOOP permit 30
+ match interface lo3
+ set metric 14
+ 
+router ospf 13
+ router-id 0.0.0.3
+ network 172.16.13.0 0.0.0.255 area 13
+ redistribute connected subnets metric-type 1 route-map LOOP
