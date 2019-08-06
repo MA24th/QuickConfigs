@@ -1,0 +1,33 @@
+CR1
+!-----------------------!
+ipv6 unicast-routing
+
+ipv6 router ospf 13
+ router-id 0.0.0.1
+
+interface fa0/0
+ ipv6 address fe80::1 link-local
+ ipv6 address 2001:12::1/64
+ ipv6 rip RIPng enable
+ no shutdown
+
+interface se1/0
+ ipv6 address fe80::1 link-local
+ ipv6 address 2001:13::1/64
+ ipv6 ospf 13 area 0
+ ipv6 ospf cost 1
+ no shutdown 
+ 
+ipv6 router rip RIPng
+ redistribute ospf 13 
+ 
+!-----------------------!
+ipv6 prefix-list L1 permit 3::1/128 
+ipv6 prefix-list L1 permit 2001:13::/64 
+route-map LOOP permit 10
+ match ipv6 address prefix-list L1
+ 
+ipv6 router rip RIPng
+ redistribute ospf 13 
+ redistribute ospf 13 metric 1
+ redistribute ospf 13 metric 1 route-map LOOP
