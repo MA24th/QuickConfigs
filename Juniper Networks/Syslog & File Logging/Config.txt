@@ -1,0 +1,32 @@
+Syslog
+==================================================
+set system syslog user * any emergency
+set system syslog file messages any any
+set system syslog file messages authorization info
+set system syslog file interactive-commands interactive-commands any
+
+file show /var/log/messages | last | no-more
+show log messages | last | no-more
+
+file show /var/log/interactive-commands | last | no-more
+show log messages | last | no-more
+
+Custom File Logging
+==================================================
+set system syslog file AUTH authorization any
+
+set system syslog file COMMANDS explicit-priority interactive-commands any
+
+Console Logging (Does not mean Terminal)
+==================================================
+set system syslog console any any
+set system syslog console any info
+
+User Logging (Terminal)
+==================================================
+set system syslog user root any any 
+set system syslog user * any info
+
+Log to Syslog Server
+==================================================
+set system syslog host 2.0.0.2 any any
