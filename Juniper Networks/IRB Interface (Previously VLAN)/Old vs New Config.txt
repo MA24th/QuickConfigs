@@ -1,0 +1,30 @@
+Old
+!-----------------------!
+set vlans VLAN10 vlan-id 10
+set vlans VLAN10 l3-interface vlan.10
+
+set interfaces ge-0/0/1.0 family ethernet-switching vlan members VLAN10
+set interfaces ge-0/0/1.0 family ethernet-switching port-mode access
+
+set interfaces ge-0/0/2.0 family ethernet-switching vlan members VLAN10
+set interfaces ge-0/0/2.0 family ethernet-switching port-mode access
+
+set interfaces ge-0/0/3.0 family ethernet-switching vlan members VLAN10
+set interfaces ge-0/0/3.0 family ethernet-switching port-mode access
+
+New
+!-----------------------!
+set protocols l2-learning global-mode switching
+request system reboot
+
+set vlans VLAN10 vlan-id 10
+set vlans VLAN10 l3-interface irb.10
+
+set interfaces ge-0/0/1.0 family ethernet-switching vlan members VLAN10
+set interfaces ge-0/0/1.0 family ethernet-switching interface-mode access
+
+set interfaces ge-0/0/2.0 family ethernet-switching vlan members VLAN10
+set interfaces ge-0/0/2.0 family ethernet-switching interface-mode access
+
+set interfaces ge-0/0/3.0 family ethernet-switching vlan members VLAN10
+set interfaces ge-0/0/3.0 family ethernet-switching interface-mode access

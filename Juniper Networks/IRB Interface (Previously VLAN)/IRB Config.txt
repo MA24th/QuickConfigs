@@ -1,0 +1,47 @@
+Global Mode
+!-----------------------!
+set protocols l2-learning global-mode switching
+request system reboot
+
+VLANs
+!-----------------------!
+set vlans VLAN10 vlan-id 10
+set vlans VLAN10 l3-interface irb.10
+
+delete interfaces ge-0/0/1.0
+delete interfaces ge-0/0/2.0
+delete interfaces ge-0/0/3.0
+set interfaces ge-0/0/1.0 family ethernet-switching vlan members VLAN10
+set interfaces ge-0/0/1.0 family ethernet-switching interface-mode access
+
+set interfaces ge-0/0/2.0 family ethernet-switching vlan members VLAN10
+set interfaces ge-0/0/2.0 family ethernet-switching interface-mode access
+
+set interfaces ge-0/0/3.0 family ethernet-switching vlan members VLAN10
+set interfaces ge-0/0/3.0 family ethernet-switching interface-mode access
+
+IRB & WAN Interface
+!-----------------------!
+set interfaces ge-0/0/0.0 family inet address 1.0.0.1/30
+
+set interface irb.10 family inet address 10.0.10.1/24
+
+Security & Firewall
+!-----------------------!
+edit security zones
+ set security-zone trust interfaces irb.10
+ set security-zone trust host-inbound system-services all
+ set security-zone trust host-inbound protocols all
+ 
+ set security-zone untrust interfaces ge-0/0/0.0
+ set security-zone untrust host-inbound system-services ping
+
+Source NAT (PAT)
+!-----------------------! 
+set security nat source rule-set PAT from zone trust
+set security nat source rule-set PAT to zone untrust
+set security nat source rule-set PAT rule 1 match source-address 0.0.0.0/0
+set security nat source rule-set PAT rule 1 then source-nat interface
+
+Verify
+!-----------------------!
