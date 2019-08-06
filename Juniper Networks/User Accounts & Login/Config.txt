@@ -1,0 +1,41 @@
+Root setup (Pa$$w0rd)
+==================================================
+set system root-authentication encrypted-password "$1$pW.aob99$3CWqRk6.eOy5sRjnNqymk0"
+
+Interfaces & Connectivity
+==================================================
+
+delete security zones security-zone untrust interfaces ge-0/0/0.0
+
+edit security zones security-zone trust 
+set interfaces ge-0/0/0.0 host-inbound-traffic system-services https
+set interfaces ge-0/0/0.0 host-inbound-traffic system-services ssh
+
+top
+
+set interfaces ge-0/0/0.0 family inet address 10.0.0.1/24
+
+User Accounts
+==================================================
+edit system login
+ set user bpin class super-user authentication encrypted-password "$1$pW.aob99$3CWqRk6.eOy5sRjnNqymk0"
+ 
+ set user op class operator authentication encrypted-password "$1$pW.aob99$3CWqRk6.eOy5sRjnNqymk0"
+ 
+ set user ro class read-only authentication encrypted-password "$1$pW.aob99$3CWqRk6.eOy5sRjnNqymk0"
+ 
+Device Hardening
+==================================================
+
+edit system services web-management
+ delete
+ set https system-generated-certificate port 443 interface ge-0/0/0.0
+ 
+edit system services ssh
+ set root-login deny
+ set protocol-version v2
+ set connection-limit 3
+ set rate-limit 3
+ set max-sessions-per-connection 3
+
+show log messages | match login
