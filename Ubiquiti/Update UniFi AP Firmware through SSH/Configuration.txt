@@ -1,0 +1,41 @@
+Method #1 Download Firmware from Ubiquiti
+!---------------------------------------!
+#Connect via SSH to UAP using terminal client
+		 
+upgrade http://dl.ubnt.com/unifi/firmware/<modelnr>/firmware<version>.bin
+	
+Method #2 Download Firmware from Controller
+!-----------------------------------------!
+#Connect via SSH to UAP using terminal client
+#The local path on Linux-based controllers is /usr/lib/unifi/dl/firmware/...
+
+upgrade http://aws-elastic-ip:8080/dl/firmware/<modelnr>/firmware<version>.bin
+
+#Change the <modelnr> value depending on your UniFi Model:
+
+BZ2	 	 = UAP, UAP-LR, UAP-OD, UAP-OD5 
+U2HSR	 = UAP-Outdoor+
+U2IW	 = UAP-InWall
+U2Sv2	 = UAP-v2, UAP-LR-v2
+U7E	 	 = UAP-AC, UAP-AC v2, UAP-AC-OD
+U7P	 	 = UAP-Pro
+U7PG2	 = UAP-AC-Lite/AC-LR/AC-Pro/AC-EDU/AC-M/AC-M-PRO/AC-IW
+UGW3	 = USG
+UGW4	 = USG-Pro-4
+US24P250 = US (all current models, with the exception of the US-16-XG)
+USXG	 = US-16-XG
+
+Method #3 Upload the Firmware from a local device
+!-----------------------------------------------!
+#Download the firmware to local PC
+https://www.ubnt.com/download/unifi/
+
+#Rename the firmware file to fwupdate.bin
+#Connect via SCP to UAP using WinSCP
+#Place the file into /tmp/
+
+#Path on UAP is /tmp/fwupdate.bin
+
+#Connect via SSH to UAP using terminal client and run:
+
+syswrapper.sh upgrade2 &
