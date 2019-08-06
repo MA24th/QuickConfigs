@@ -1,0 +1,29 @@
+CR1
+!-----------------------!
+int lo0 
+ ip add 10.0.12.1 255.255.255.255  
+! 
+interface lo1
+ ip add 1.1.1.1 255.255.255.255
+! 
+int virtual-template 12  
+ ip unnumbered lo0 
+ ip mtu 1492 
+ encapsulation ppp 
+ peer default ip address pool IPCP
+!
+ip local pool IPCP 10.0.12.2
+!
+bba-group pppoe PPPOE 
+ virtual-template 12 
+!
+interface fa0/0
+ pppoe enable group PPPOE
+ mac-address 0011.1111.1111
+ no shutdown
+!
+router rip
+ version 2
+ no auto-summary
+ network 10.0.0.0
+ network 1.0.0.0

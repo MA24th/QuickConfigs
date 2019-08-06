@@ -1,0 +1,22 @@
+CR2
+!-----------------------!
+interface dialer1 
+ ip address negotiated 
+ ip mtu 1492 
+ encapsulation ppp 
+ dialer pool 12 
+!
+interface fa0/0
+ mac-address 0022.2222.2222
+ pppoe-client dial-pool-number 12
+ no shutdown
+! 
+interface lo1
+ ip add 2.2.2.2 255.255.255.255
+!
+router rip
+ version 2
+ no auto-summary
+ network 10.0.0.0
+ network 2.0.0.0
+ no validate-update-source
