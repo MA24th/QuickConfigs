@@ -1,0 +1,37 @@
+CR1
+!-----------------------!
+interface fa0/0
+ ip address 10.0.12.1 255.255.255.252
+ mac-address 0011.1111.1111
+ no shutdown
+ 
+router rip
+ version 2
+ no auto-summary
+ network 10.0.0.0
+
+Offset Filtering
+!-----------------------! 
+access-list 1 permit 2.2.2.0 0.0.0.3
+
+router rip
+ offset-list 1 in 16 fa0/0
+ offset-list 0 in 16 fa0/0
+
+Distribute Filtering
+!-----------------------! 
+ip prefix-list L1 deny 2.2.2.1/32
+ip prefix-list L1 permit 0.0.0.0/0 le 32
+
+router rip
+ distribute-list prefix L1 in fa0/0
+
+Distribute + Gateway
+!-----------------------!
+ip prefix-list L1 deny 2.2.2.1/32
+ip prefix-list L1 permit 0.0.0.0/0 le 32
+
+ip prefix-list CR2 permit 10.0.12.2/32
+
+router rip
+ distribute-list prefix L1 gateway CR2 in fa0/0
