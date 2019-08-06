@@ -1,0 +1,250 @@
+# Amazon Web Services
+# Virtual Private Cloud
+#
+# AWS utilizes unique identifiers to manipulate the configuration of 
+# a VPN Connection. Each VPN Connection is assigned a VPN Connection Identifier
+# and is associated with two other identifiers, namely the 
+# Customer Gateway Identifier and the Virtual Private Gateway Identifier.
+#
+# Your VPN Connection ID  		    : vpn-c0b054a9
+# Your Virtual Private Gateway ID           : vgw-d30032ce
+# Your Customer Gateway ID 		    : cgw-f21e2cef
+#
+# This configuration consists of two tunnels. Both tunnels must be 
+# configured on your Customer Gateway.
+#
+#
+# --------------------------------------------------------------------------------
+# IPSec Tunnel #1
+# --------------------------------------------------------------------------------
+# #1: Internet Key Exchange (IKE) Configuration
+#
+# A proposal is established for the supported IKE encryption, 
+# authentication, Diffie-Hellman, and lifetime parameters.
+#
+set security ike proposal ike-prop-vpn-c0b054a9-1 authentication-method pre-shared-keys 
+set security ike proposal ike-prop-vpn-c0b054a9-1 authentication-algorithm sha1
+set security ike proposal ike-prop-vpn-c0b054a9-1 encryption-algorithm aes-128-cbc
+set security ike proposal ike-prop-vpn-c0b054a9-1 lifetime-seconds 28800
+set security ike proposal ike-prop-vpn-c0b054a9-1 dh-group group2
+
+# An IKE policy is established to associate a Pre Shared Key with the  
+# defined proposal.
+#
+set security ike policy ike-pol-vpn-c0b054a9-1 mode main 
+set security ike policy ike-pol-vpn-c0b054a9-1 proposals ike-prop-vpn-c0b054a9-1
+set security ike policy ike-pol-vpn-c0b054a9-1 pre-shared-key ascii-text ullOfhXpV7fjUU0er8YXCNYdqGvIBucl
+
+# The IKE gateway is defined to be the Virtual Private Gateway. The gateway 
+# configuration associates a local interface, remote IP address, and
+# IKE policy.
+#
+# This example shows the outside of the tunnel as interface ge-0/0/0.0.
+# This should be set to the interface that IP address 210.10.218.230 is
+# associated with.
+# This address is configured with the setup for your Customer Gateway.
+#
+# If the address changes, the Customer Gateway and VPN Connection must be recreated.
+#
+set security ike gateway gw-vpn-c0b054a9-1 ike-policy ike-pol-vpn-c0b054a9-1
+set security ike gateway gw-vpn-c0b054a9-1 external-interface ge-0/0/0.0
+set security ike gateway gw-vpn-c0b054a9-1 address 52.63.29.199
+
+# Troubleshooting IKE connectivity can be aided by enabling IKE tracing.
+# The configuration below will cause the router to log IKE messages to
+# the 'kmd' log. Run 'show messages kmd' to retrieve these logs.
+# set security ike traceoptions file kmd
+# set security ike traceoptions file size 1024768
+# set security ike traceoptions file files 10
+# set security ike traceoptions flag all
+
+# #2: IPSec Configuration
+#
+# The IPSec proposal defines the protocol, authentication, encryption, and
+# lifetime parameters for our IPSec security association.
+#
+set security ipsec proposal ipsec-prop-vpn-c0b054a9-1 protocol esp
+set security ipsec proposal ipsec-prop-vpn-c0b054a9-1 authentication-algorithm hmac-sha1-96
+set security ipsec proposal ipsec-prop-vpn-c0b054a9-1 encryption-algorithm aes-128-cbc
+set security ipsec proposal ipsec-prop-vpn-c0b054a9-1 lifetime-seconds 3600
+
+# The IPSec policy incorporates the Diffie-Hellman group and the IPSec
+# proposal.
+#
+set security ipsec policy ipsec-pol-vpn-c0b054a9-1 perfect-forward-secrecy keys group2
+set security ipsec policy ipsec-pol-vpn-c0b054a9-1 proposals ipsec-prop-vpn-c0b054a9-1
+
+# A security association is defined here. The IPSec Policy and IKE gateways
+# are associated with a tunnel interface (st0.1).
+# The tunnel interface ID is assumed; if other tunnels are defined on
+# your router, you will need to specify a unique interface name 
+# (for example, st0.10).
+#
+set security ipsec vpn vpn-c0b054a9-1 bind-interface st0.1
+set security ipsec vpn vpn-c0b054a9-1 ike gateway gw-vpn-c0b054a9-1
+set security ipsec vpn vpn-c0b054a9-1 ike ipsec-policy ipsec-pol-vpn-c0b054a9-1
+set security ipsec vpn vpn-c0b054a9-1 df-bit clear 
+
+# This option enables IPSec Dead Peer Detection, which causes periodic
+# messages to be sent to ensure a Security Association remains operational.
+#
+set security ike gateway gw-vpn-c0b054a9-1 dead-peer-detection
+
+
+# #3: Tunnel Interface Configuration
+#
+
+# The tunnel interface is configured with the internal IP address.
+#
+set interfaces st0.1 family inet address 169.254.33.138/30
+set interfaces st0.1 family inet mtu 1436
+set security zones security-zone trust interfaces st0.1
+
+# The security zone protecting external interfaces of the router must be 
+# configured to allow IKE traffic inbound.
+#
+set security zones security-zone untrust host-inbound-traffic system-services ike
+
+# The security zone protecting internal interfaces (including the logical 
+# tunnel interfaces) must be configured to allow BGP traffic inbound.
+#
+set security zones security-zone trust host-inbound-traffic protocols bgp
+
+# This option causes the router to reduce the Maximum Segment Size of
+# TCP packets to prevent packet fragmentation.
+#
+set security flow tcp-mss ipsec-vpn mss 1387
+
+# --------------------------------------------------------------------------------
+# #4: Static Route Configuration
+#
+# VPN monitoring is used in order to provide failover with multiple tunnels. If the primary tunnel fails, the redundant tunnel will automatically be used.
+#
+set security ipsec vpn vpn-c0b054a9-1 vpn-monitor source-interface st0.1 
+set security ipsec vpn vpn-c0b054a9-1 vpn-monitor destination-ip 169.254.33.137
+
+# Your Customer Gateway needs to set a static route for the prefix corresponding to your VPC on the tunnel.
+# An example for a VPC with the prefix 10.0.0.0/16 is provided below
+# set routing-options static route 10.0.0.0/16 next-hop st0.1
+#
+# --------------------------------------------------------------------------------
+# IPSec Tunnel #2
+# --------------------------------------------------------------------------------
+# #1: Internet Key Exchange (IKE) Configuration
+#
+# A proposal is established for the supported IKE encryption, 
+# authentication, Diffie-Hellman, and lifetime parameters.
+#
+set security ike proposal ike-prop-vpn-c0b054a9-2 authentication-method pre-shared-keys 
+set security ike proposal ike-prop-vpn-c0b054a9-2 authentication-algorithm sha1
+set security ike proposal ike-prop-vpn-c0b054a9-2 encryption-algorithm aes-128-cbc
+set security ike proposal ike-prop-vpn-c0b054a9-2 lifetime-seconds 28800
+set security ike proposal ike-prop-vpn-c0b054a9-2 dh-group group2
+
+# An IKE policy is established to associate a Pre Shared Key with the  
+# defined proposal.
+#
+set security ike policy ike-pol-vpn-c0b054a9-2 mode main 
+set security ike policy ike-pol-vpn-c0b054a9-2 proposals ike-prop-vpn-c0b054a9-2
+set security ike policy ike-pol-vpn-c0b054a9-2 pre-shared-key ascii-text dBO_6eIpSlctVmoqMDLSkY1JX1RhcHNt
+
+# The IKE gateway is defined to be the Virtual Private Gateway. The gateway 
+# configuration associates a local interface, remote IP address, and
+# IKE policy.
+#
+# This example shows the outside of the tunnel as interface ge-0/0/0.0.
+# This should be set to the interface that IP address 210.10.218.230 is
+# associated with.
+# This address is configured with the setup for your Customer Gateway.
+#
+# If the address changes, the Customer Gateway and VPN Connection must be recreated.
+#
+set security ike gateway gw-vpn-c0b054a9-2 ike-policy ike-pol-vpn-c0b054a9-2
+set security ike gateway gw-vpn-c0b054a9-2 external-interface ge-0/0/0.0
+set security ike gateway gw-vpn-c0b054a9-2 address 52.63.117.182
+
+# Troubleshooting IKE connectivity can be aided by enabling IKE tracing.
+# The configuration below will cause the router to log IKE messages to
+# the 'kmd' log. Run 'show messages kmd' to retrieve these logs.
+# set security ike traceoptions file kmd
+# set security ike traceoptions file size 1024768
+# set security ike traceoptions file files 10
+# set security ike traceoptions flag all
+
+# #2: IPSec Configuration
+#
+# The IPSec proposal defines the protocol, authentication, encryption, and
+# lifetime parameters for our IPSec security association.
+#
+set security ipsec proposal ipsec-prop-vpn-c0b054a9-2 protocol esp
+set security ipsec proposal ipsec-prop-vpn-c0b054a9-2 authentication-algorithm hmac-sha1-96
+set security ipsec proposal ipsec-prop-vpn-c0b054a9-2 encryption-algorithm aes-128-cbc
+set security ipsec proposal ipsec-prop-vpn-c0b054a9-2 lifetime-seconds 3600
+
+# The IPSec policy incorporates the Diffie-Hellman group and the IPSec
+# proposal.
+#
+set security ipsec policy ipsec-pol-vpn-c0b054a9-2 perfect-forward-secrecy keys group2
+set security ipsec policy ipsec-pol-vpn-c0b054a9-2 proposals ipsec-prop-vpn-c0b054a9-2
+
+# A security association is defined here. The IPSec Policy and IKE gateways
+# are associated with a tunnel interface (st0.2).
+# The tunnel interface ID is assumed; if other tunnels are defined on
+# your router, you will need to specify a unique interface name 
+# (for example, st0.10).
+#
+set security ipsec vpn vpn-c0b054a9-2 bind-interface st0.2
+set security ipsec vpn vpn-c0b054a9-2 ike gateway gw-vpn-c0b054a9-2
+set security ipsec vpn vpn-c0b054a9-2 ike ipsec-policy ipsec-pol-vpn-c0b054a9-2
+set security ipsec vpn vpn-c0b054a9-2 df-bit clear 
+
+# This option enables IPSec Dead Peer Detection, which causes periodic
+# messages to be sent to ensure a Security Association remains operational.
+#
+set security ike gateway gw-vpn-c0b054a9-2 dead-peer-detection
+
+
+# #3: Tunnel Interface Configuration
+#
+
+# The tunnel interface is configured with the internal IP address.
+#
+set interfaces st0.2 family inet address 169.254.32.50/30
+set interfaces st0.2 family inet mtu 1436
+set security zones security-zone trust interfaces st0.2
+
+# The security zone protecting external interfaces of the router must be 
+# configured to allow IKE traffic inbound.
+#
+set security zones security-zone untrust host-inbound-traffic system-services ike
+
+# The security zone protecting internal interfaces (including the logical 
+# tunnel interfaces) must be configured to allow BGP traffic inbound.
+#
+set security zones security-zone trust host-inbound-traffic protocols bgp
+
+# This option causes the router to reduce the Maximum Segment Size of
+# TCP packets to prevent packet fragmentation.
+#
+set security flow tcp-mss ipsec-vpn mss 1387
+
+# --------------------------------------------------------------------------------
+# #4: Static Route Configuration
+#
+# VPN monitoring is used in order to provide failover with multiple tunnels. If the primary tunnel fails, the redundant tunnel will automatically be used.
+#
+set security ipsec vpn vpn-c0b054a9-2 vpn-monitor source-interface st0.2 
+set security ipsec vpn vpn-c0b054a9-2 vpn-monitor destination-ip 169.254.32.49
+
+# Your Customer Gateway needs to set a static route for the prefix corresponding to your VPC on the tunnel.
+# An example for a VPC with the prefix 10.0.0.0/16 is provided below
+# set routing-options static route 10.0.0.0/16 next-hop st0.2
+#
+
+# Additional Notes and Questions
+#  - Amazon Virtual Private Cloud Getting Started Guide: 
+#       http://docs.amazonwebservices.com/AmazonVPC/latest/GettingStartedGuide
+#  - Amazon Virtual Private Cloud Network Administrator Guide: 
+#       http://docs.amazonwebservices.com/AmazonVPC/latest/NetworkAdminGuide
+#  - XSL Version: 2009-07-15-1119716
+      
