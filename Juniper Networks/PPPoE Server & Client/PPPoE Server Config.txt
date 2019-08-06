@@ -1,0 +1,45 @@
+PPPoE
+!-----------------------!
+delete interfaces ge-0/0/0.0
+set interfaces ge-0/0/0.0 encapsulation ppp-over-ether
+
+edit interfaces pp0.0
+ set pppoe-options underlying-interface ge-0/0/0.0
+ set pppoe-options server
+ set family inet mtu 1492
+ set family inet address 1.0.0.10/32 destination 1.0.0.1
+
+PPPoE Authentication
+!-----------------------!
+edit interfaces pp0.0
+ set ppp-options pap local-name SRX2
+ set ppp-options pap default-password Pa$$w0rd
+
+ set ppp-options chap default-chap-secret Pa$$w0rd
+ set ppp-options chap local-name SRX2
+
+Routing & Security
+!-----------------------!
+edit security zones security-zone trust 
+ set host-inbound-traffic system-services ping
+ set interfaces pp0.0 
+
+Debug & Verify
+!-----------------------!
+set protocols ppp traceoptions file ppp
+set protocols ppp traceoptions level all
+set protocols ppp traceoptions flag all
+set protocols pppoe traceoptions file pppoe
+set protocols pppoe traceoptions level all
+set protocols pppoe traceoptions flag all
+
+show log pppoe
+show log ppp
+
+show ppp interface pp0 extensive
+show pppoe statistics
+show pppoe interfaces brief
+show pppoe interfaces 
+
+clear pppoe sessions 
+clear pppoe statistics
