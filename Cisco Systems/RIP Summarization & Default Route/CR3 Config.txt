@@ -1,0 +1,15 @@
+CR3
+!-----------------------!
+interface fa0/1
+ ip address 192.168.23.3 255.255.255.0
+ no shutdown
+!
+interface se1/0
+ ip address 172.16.13.3 255.255.255.0
+ no shutdown
+!
+router rip
+ version 2
+ no auto-summary
+ network 192.168.23.0
+ network 172.16.0.0

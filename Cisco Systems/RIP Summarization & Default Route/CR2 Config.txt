@@ -1,0 +1,33 @@
+CR2
+!-----------------------!
+interface fa0/0
+ ip address 10.0.12.2 255.255.255.0
+ no shutdown
+!
+interface fa0/1
+ ip address 192.168.23.2 255.255.255.0
+ no shutdown
+!
+interface lo1
+ ip add 2.2.2.1 255.255.255.255
+interface lo2
+ ip add 2.2.2.2 255.255.255.255
+interface lo3
+ ip add 2.2.2.3 255.255.255.255
+!
+router rip
+ version 2
+ no auto-summary
+ network 10.0.0.0
+ network 192.168.23.0
+ network 2.0.0.0
+
+Summarization 
+!-----------------------!
+int fa0/0
+ ip summary-address rip 2.2.2.0 255.255.255.248
+!
+int fa0/1
+ ip summary-address rip 2.2.2.0 255.255.255.248
+ 
+ip route 2.2.2.0 255.255.255.248 null0

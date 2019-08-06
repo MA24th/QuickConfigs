@@ -1,0 +1,21 @@
+CR1
+!-----------------------!
+interface fa0/0
+ ip address 10.0.12.1 255.255.255.0
+ no shutdown
+!
+interface se1/0
+ ip address 172.16.13.1 255.255.255.0
+ no shutdown
+!
+router rip
+ version 2
+ no auto-summary
+ network 10.0.0.0
+ network 172.16.0.0
+ 
+route-map RIP permit 10
+ set interface se1/0
+
+router rip
+ default-information originate route-map RIP
