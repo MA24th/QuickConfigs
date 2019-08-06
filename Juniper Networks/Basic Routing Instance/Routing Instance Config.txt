@@ -1,0 +1,39 @@
+Routing Instance
+!-----------------------!
+set interfaces ge-0/0/1 unit 0 family inet address 172.16.0.1/24
+
+set routing-instances RI instance-type virtual-router
+set routing-instances RI interface ge-0/0/1.0
+set routing-instances RI interface pp0.1
+set routing-instances RI routing-options static route 0.0.0.0/0 next-hop pp0.1
+
+set routing-instances RI system services dhcp-local-server group DHCP_POOL interface ge-0/0/1.0
+set routing-instances RI access address-assignment pool DHCP_POOL family inet network 172.16.0.0/24
+set routing-instances RI access address-assignment pool DHCP_POOL family inet range DHCP_RANGE low 172.16.0.10
+set routing-instances RI access address-assignment pool DHCP_POOL family inet range DHCP_RANGE high 172.16.0.250
+set routing-instances RI access address-assignment pool DHCP_POOL family inet dhcp-attributes maximum-lease-time 86400
+set routing-instances RI access address-assignment pool DHCP_POOL family inet dhcp-attributes domain-name lab.local
+set routing-instances RI access address-assignment pool DHCP_POOL family inet dhcp-attributes name-server 172.16.0.1
+set routing-instances RI access address-assignment pool DHCP_POOL family inet dhcp-attributes router 172.16.0.1
+
+Security & Firewall
+!-----------------------!
+edit security zones security-zone RI_UNTRUST
+ set interfaces pp0.1 host-inbound-traffic system-services ping
+
+edit security zones security-zone RI_TRUST
+ set interfaces ge-0/0/1.0 host-inbound-traffic system-services all 
+ set interfaces ge-0/0/1.0 host-inbound-traffic protocols all 
+
+edit security policies from-zone RI_TRUST to-zone RI_UNTRUST 
+ set policy 1 match source-address any
+ set policy 1 match destination-address any
+ set policy 1 match application any
+ set policy 1 then permit
+
+NAT
+!-----------------------!
+set security nat source rule-set RI_PAT from zone RI_TRUST
+set security nat source rule-set RI_PAT to zone RI_UNTRUST
+set security nat source rule-set RI_PAT rule 1 match source-address 0.0.0.0/0
+set security nat source rule-set RI_PAT rule 1 then source-nat interface
