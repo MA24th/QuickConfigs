@@ -1,0 +1,15 @@
+CR2
+!-----------------------!
+router ospf 1
+ router-id 0.0.0.2 
+
+interface se1/0
+ ip address 10.0.12.2 255.255.255.0
+ ip ospf network point-to-point
+ no shutdown
+ ip ospf 1 area 0
+ 
+interface lo1
+ ip add 2.2.2.2 255.255.255.0
+ ip ospf network point-to-point
+ ip ospf 1 area 0
