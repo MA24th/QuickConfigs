@@ -1,0 +1,76 @@
+Interfaces & Routing
+!-----------------------!
+set interfaces ge-0/0/0 unit 0 family inet address 1.0.0.1/24
+set interfaces ge-0/0/1 unit 0 family inet address 172.16.0.1/24
+set interfaces st0.0 family inet 
+
+set routing-options static route 10.0.0.0/24 next-hop st0.0
+set routing-options static route 0.0.0.0/0 next-hop 1.0.0.10
+
+Policy-Based VPN
+!-----------------------!
+edit security 
+ set ike proposal IKE authentication-method pre-shared-keys
+ set ike proposal IKE dh-group group14
+ set ike proposal IKE authentication-algorithm sha-256
+ set ike proposal IKE encryption-algorithm aes-256-cbc
+ set ike proposal IKE lifetime-seconds 86400
+
+ set ike policy IKE_POLICY mode main
+ set ike policy IKE_POLICY proposals IKE
+ set ike policy IKE_POLICY pre-shared-key ascii-text Pa$$w0rd
+ set ike gateway IKE_GATEWAY ike-policy IKE_POLICY
+ set ike gateway IKE_GATEWAY address 2.0.0.1
+ set ike gateway IKE_GATEWAY external-interface ge-0/0/0
+ set ike gateway IKE_GATEWAY local-address 1.0.0.1 
+ 
+ set ipsec proposal ESP protocol esp
+ set ipsec proposal ESP authentication-algorithm hmac-md5-96
+ set ipsec proposal ESP encryption-algorithm aes-128-cbc
+ set ipsec proposal ESP lifetime-seconds 43200
+ set ipsec policy ESP_POLICY proposals ESP
+ set ipsec vpn ESP_VPN bind-interface st0.0 
+ set ipsec vpn ESP_VPN ike gateway IKE_GATEWAY
+ set ipsec vpn ESP_VPN ike ipsec-policy ESP_POLICY
+ set ipsec vpn ESP_VPN establish-tunnels immediately
+ 
+ set ipsec vpn ESP_VPN ike proxy-identity local 172.16.0.0/24
+ set ipsec vpn ESP_VPN ike proxy-identity remote 10.0.0.0/24
+ set ipsec vpn ESP_VPN ike proxy-identity service any
+ 
+Security
+!-----------------------!
+edit security zones
+ set security-zone trust interfaces ge-0/0/1.0
+ set security-zone trust host-inbound system-services all
+ set security-zone trust host-inbound protocols all
+ 
+ set security-zone VPN interfaces st0.0
+ set security-zone VPN host-inbound system-services all
+ set security-zone VPN host-inbound protocols all
+ 
+ set security-zone untrust interfaces ge-0/0/0.0
+ set security-zone untrust host-inbound system-services ping
+ set security-zone untrust host-inbound system-services ike
+ set security-zone untrust host-inbound protocols esp
+
+edit security policies from-zone trust to-zone VPN 
+ set policy TRUST_TO_VPN match source-address any
+ set policy TRUST_TO_VPN match destination-address any
+ set policy TRUST_TO_VPN match application any
+ set policy TRUST_TO_VPN then permit
+
+edit security policies from-zone VPN to-zone trust
+ set policy VPN_TO_TRUST match source-address any
+ set policy VPN_TO_TRUST match destination-address any
+ set policy VPN_TO_TRUST match application any
+ set policy VPN_TO_TRUST then permit 
+ 
+Verify
+!-----------------------!
+show security ike security-associations
+show security ike security-associations detail
+
+show security ipsec sa
+show security ipsec sa detail
+show security ipsec statistics
