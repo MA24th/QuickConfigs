@@ -1,0 +1,12 @@
+CR1
+!-----------------------!
+ipv6 unicast-routing
+
+interface fa0/0
+ mac-address 0011.1111.1111
+ ipv6 address fe80::1 link-local
+ ipv6 rip RIPng enable
+ no shutdown
+ 
+ipv6 router rip RIPng 
+ timers 30 180 0 120

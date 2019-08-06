@@ -1,0 +1,19 @@
+CR2
+!-----------------------!
+ipv6 unicast-routing
+
+interface fa0/0
+ mac-address 0022.2222.2222
+ ipv6 address fe80::1 link-local
+ ipv6 rip RIPng enable
+ no shutdown
+ 
+interface lo1
+ ipv6 address 2::1/128 
+ ipv6 rip RIPng enable
+interface lo2
+ ipv6 address 2::2/128 
+ ipv6 rip RIPng enable 
+interface lo3
+ ipv6 address 2::3/128 
+ ipv6 rip RIPng enable
