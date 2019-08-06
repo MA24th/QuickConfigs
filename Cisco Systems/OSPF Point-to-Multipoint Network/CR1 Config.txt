@@ -1,0 +1,10 @@
+CR1
+!-----------------------!
+router ospf 1
+ router-id 0.0.0.1 
+
+interface gi0/0
+ ip address 10.0.0.1 255.255.255.0
+ ip ospf network point-to-multipoint
+ ip ospf 1 area 1234
+ no shutdown
