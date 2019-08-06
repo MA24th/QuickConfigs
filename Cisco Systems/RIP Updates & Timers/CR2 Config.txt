@@ -1,0 +1,24 @@
+CR2
+!-----------------------!
+interface fa0/0
+ ip address 10.0.12.2 255.255.255.252
+ mac-address 0022.2222.2222
+ ip rip v2-broadcast 
+ ip rip send version 1 2 
+ no shutdown
+! 
+interface lo1
+ ip add 2.2.2.1 255.255.255.255
+! 
+interface lo2
+ ip add 2.2.2.2 255.255.255.255
+! 
+interface lo3
+ ip add 2.2.2.3 255.255.255.255
+!
+router rip
+ version 2
+ no auto-summary
+ network 10.0.0.0
+ network 2.0.0.0
+ flash-update-threshold 20
