@@ -1,0 +1,12 @@
+CR2
+!-----------------------!
+ipv6 unicast-routing
+
+interface fa0/0
+ ipv6 address fe80::2 link-local
+ ipv6 address 2001:12::2/64
+ ipv6 rip RIPng enable
+ 
+interface lo1
+ ipv6 address 2::2/128 
+ ipv6 rip RIPng enable
