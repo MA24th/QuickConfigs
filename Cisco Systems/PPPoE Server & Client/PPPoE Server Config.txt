@@ -1,0 +1,35 @@
+PPPoE Server
+!-----------------------!
+hostname CR1
+bba-group pppoe PPPOE
+ virtual-template 1
+ 
+interface gi0/0
+ pppoe enable group PPPOE
+ no shutdown
+
+interface lo1
+ ip address 1.0.0.10 255.255.255.255
+
+interface virtual-template1
+ encapsulation ppp
+ ip unnumbered lo1
+ ip mtu 1492
+ peer default ip address pool IPCP
+ 
+ip local pool IPCP 1.0.0.1
+
+Authentication
+!-----------------------!
+interface virtual-template1
+ ppp authentication pap
+
+interface virtual-template1
+ ppp authentication chap
+ 
+username CR2 password Pa$$w0rd
+
+Verification
+!-----------------------!
+debug ppp negotiation
+who

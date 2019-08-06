@@ -1,0 +1,24 @@
+Cisco PPPoE Client
+!-----------------------!
+hostname CR2
+interface gi0/0
+  pppoe-client dial-pool-number 12
+ 
+interface dialer 1
+ dialer pool 12
+ ip mtu 1492
+ encapsulation ppp
+ ip address negotiated
+
+Authentication
+!-----------------------!
+interface dialer 1
+ ppp pap sent-username CR2 password Pa$$w0rd
+
+interface dialer 1
+ ppp chap hostname CR2
+ ppp chap password Pa$$w0rd
+
+Routing 
+!-----------------------!
+ip route 0.0.0.0 0.0.0.0 1.0.0.10 
