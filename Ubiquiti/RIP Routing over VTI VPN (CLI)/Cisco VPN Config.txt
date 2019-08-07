@@ -1,0 +1,59 @@
+Default Interfaces
+==================================================
+interface gi0/0
+ ip address 1.0.0.1 255.255.255.0
+ no shutdown
+interface gi1/0
+ ip address 172.16.0.1 255.255.255.0
+ no shutdown
+ 
+ip route 0.0.0.0 0.0.0.0 1.0.0.2
+ 
+Crypto VPN
+================================================
+crypto isakmp policy 10
+ encr aes
+ hash md5
+ authentication pre-share
+ group 14
+ lifetime 28800
+ 
+crypto isakmp key Pa$$w0rd address 2.0.0.1        
+
+crypto ipsec transform-set TS esp-aes esp-md5-hmac 
+ mode tunnel
+
+crypto ipsec profile IPSEC
+ set transform-set TS  
+ set security-association lifetime seconds 3600
+
+VTI Interface
+================================================== 
+interface tun0
+ ip add 12.0.0.1 255.255.255.252
+ ip mtu 1400
+ tunnel source 1.0.0.1
+ tunnel destination 2.0.0.1
+ 
+ tunnel mode ipsec ipv4
+ tunnel protection ipsec profile IPSEC
+ 
+RIP
+==================================================
+router rip
+ version 2
+ no auto-summary
+ network 12.0.0.0 
+ network 172.16.0.0 
+ neighbor 12.0.0.2
+
+Verify 
+==================================================
+show crypto isakmp sa
+show crypto ipsec sa
+show crypto engine connections active
+
+debug crypto isakmp
+
+show ip protocols
+show ip rip database

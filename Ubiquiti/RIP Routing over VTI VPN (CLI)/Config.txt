@@ -1,0 +1,54 @@
+Default Interfaces
+==================================================
+edit interfaces
+ set ethernet eth0 address 2.0.0.1/24
+ set ethernet eth1 address 10.0.0.1/24
+
+set protocols static route 0.0.0.0/0 next-hop 2.0.0.2 
+ 
+VTI Interface
+==================================================
+set interfaces vti vti0 address 12.0.0.2/30 
+set interfaces vti vti0 mtu 1400
+ 
+VPN Tunnel
+==================================================
+edit vpn ipsec 
+ set ike-group IKE lifetime 28800 
+ set ike-group IKE proposal 1 dh-group 14
+ set ike-group IKE proposal 1 encryption aes128
+ set ike-group IKE proposal 1 hash md5
+
+ set esp-group ESP lifetime 3600
+ set esp-group ESP proposal 1 encryption aes128
+ set esp-group ESP proposal 1 hash md5
+ 
+ set esp-group ESP mode tunnel
+ set esp-group ESP pfs disable
+  
+edit site-to-site peer 1.0.0.1
+ set authentication mode pre-shared-secret 
+ set authentication pre-shared-secret Pa$$w0rd
+ set description IPsecVPN
+ set connection-type initiate
+ set local-address 2.0.0.1
+ set ike-group IKE
+ set vti bind vti0
+ set vti esp-group ESP
+
+RIP
+==================================================
+edit protocols rip
+ set interface vti0
+ set network 10.0.0.0/24
+ set neighbor 12.0.0.1
+ 
+Verify 
+==================================================
+show vpn log
+show vpn ipsec policy 
+show vpn ipsec status
+show vpn ipsec sa
+
+show ip rip interface 
+show ip rip
