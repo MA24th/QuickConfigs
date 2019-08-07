@@ -1,0 +1,53 @@
+Traffic Analysis with DPI
+|-----------------------|
+set system traffic-analysis dpi enable
+set system traffic-analysis export enable
+
+#Verify
+show ubnt offload
+
+Block Category & Allow Certain Apps
+|---------------------------------|
+#See which sites are grouped under 'adult websites' 
+/usr/sbin/ubnt-dpi-util show-cat-apps TopSites-Adult
+
+#If this list is empty, upgrade your firmware!
+
+#See which category a specific site is grouped under
+/usr/sbin/ubnt-dpi-util search-app pornhub.com
+/usr/sbin/ubnt-dpi-util search-app penthouse
+
+#Some adult websites are listed under Streaming-Media
+
+#Combine Streaming-Media applications in a custom category
+edit system traffic-analysis 
+ set custom-category ADULT name hustlertube
+ set custom-category ADULT name livejasmin.com
+ set custom-category ADULT name porn.com
+ set custom-category ADULT name pornhub.com
+ set custom-category ADULT name redtube.com
+ set custom-category ADULT name xhamster.com
+ set custom-category ADULT name xnxx.com
+ set custom-category ADULT name xtube
+ set custom-category ADULT name xvideos.com
+ set custom-category ADULT name youjizz
+ set custom-category ADULT name youporn.com 
+ 
+top 
+ 
+#Drop rule for adult websites including custom category
+edit firewall name BLOCK_ADULT
+ set default-action accept
+ set rule 10 description DROP_ADULT_SITES
+ set rule 10 application category TopSites-Adult
+ set rule 10 action drop 
+ set rule 10 description DROP_ADULT_SITES
+ set rule 20 application category ADULT
+ set rule 20 action drop
+
+top
+
+#Apply to LAN interface
+set interfaces switch switch0 firewall in name BLOCK_ADULT
+ 
+commit
