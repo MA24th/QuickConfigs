@@ -1,0 +1,18 @@
+Configuration Commands
+==================================================
+configure
+edit system
+ set host-name Edgerouter
+ set login user bpin level admin
+ set login user bpin authentication plaintext-password Pa$$w0rd
+ set name-server 8.8.8.8
+ set name-server 8.8.4.4
+ set time-zone Europe/Amsterdam
+
+edit interfaces 
+ set ethernet eth0 address 2.0.0.1/24 
+ set ethernet eth0 description WAN  
+ set ethernet eth1 address 10.0.0.1/24
+ set ethernet eth1 description LAN  
+
+set protocols static route 0.0.0.0/0 next-hop 2.0.0.2 
