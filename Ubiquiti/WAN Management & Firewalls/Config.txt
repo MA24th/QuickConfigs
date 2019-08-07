@@ -1,0 +1,45 @@
+Default WAN_TO_LAN Rule
+==========================================
+edit firewall name WAN_TO_LAN 
+ set default-action drop
+ set rule 1 action accept
+ set rule 1 description Established
+ set rule 1 log disable
+ set rule 1 protocol all
+ set rule 1 state established enable
+ set rule 1 state invalid disable
+ set rule 1 state new disable
+ set rule 1 state related enable
+ 
+WAN Management Filter
+==========================================
+edit firewall name MGMT
+ set default-action drop
+ set description 'Limit Management Access'
+ set rule 1 action accept
+ set rule 1 description SSH_9222
+ set rule 1 destination port 9222
+ set rule 1 log disable
+ set rule 1 protocol tcp
+ set rule 1 source address 100.0.0.1
+  
+ set rule 2 action accept
+ set rule 2 description HTTPS_9443
+ set rule 2 destination port 9443
+ set rule 2 log disable
+ set rule 2 protocol tcp
+ set rule 2 source address 100.0.0.1
+
+Apply to Interface 
+==========================================
+edit interfaces ethernet eth0
+ set firewall in name WAN_TO_LAN
+ set firewall local name MGMT
+ 
+edit service
+ set gui listen-address 2.0.0.1
+ set gui listen-address 10.0.0.1
+ set gui https-port 9443
+ set ssh listen-address 2.0.0.1
+ set gui listen-address 10.0.0.1
+ set ssh port 9222
