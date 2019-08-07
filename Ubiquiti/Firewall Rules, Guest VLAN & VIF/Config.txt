@@ -1,0 +1,89 @@
+Virtual Interfaces (VIF)
+==================================================
+edit interfaces 
+ set ethernet eth1 vif 10 address 10.0.0.1/24
+ set ethernet eth1 vif 172 address 172.16.0.1/24
+
+GUEST_TO_LAN Firewall Policy
+==========================================
+edit firewall group network-group LAN
+ set network 192.168.0.0/16
+ set network 172.16.0.0/12
+ set network 10.0.0.0/8
+ 
+edit firewall name GUEST_TO_LAN 
+ set default-action accept
+ set rule 1 action accept
+ set rule 1 description Established
+ set rule 1 log disable
+ set rule 1 protocol all
+ set rule 1 state established enable
+ set rule 1 state related enable
+
+ set rule 2 action drop
+ set rule 2 description "Network Group"
+ set rule 2 log disable
+ set rule 2 protocol all
+ set rule 2 destination group network-group LAN
+
+GUEST_TO_LOCAL Firewall Policy
+==========================================
+edit firewall name GUEST_TO_LOCAL
+ set default-action drop
+ 
+ set rule 1 action accept
+ set rule 1 description DNS
+ set rule 1 log disable
+ set rule 1 protocol tcp_udp
+ set rule 1 destination port 53
+
+ set rule 2 action accept
+ set rule 2 description DHCP
+ set rule 2 log disable
+ set rule 2 protocol udp
+ set rule 2 destination port 67
+
+ set rule 3 action accept
+ set rule 3 description Established
+ set rule 3 log disable
+ set rule 3 protocol all
+ set rule 3 state established enable
+ set rule 3 state related enable 
+ 
+Default WAN_TO_LAN Rule
+==========================================
+edit firewall name WAN_TO_LAN 
+ set default-action drop
+ set rule 1 action accept
+ set rule 1 description Established
+ set rule 1 log disable
+ set rule 1 protocol all
+ set rule 1 state established enable
+ set rule 1 state related enable
+ 
+Apply to Interface 
+==========================================
+edit interfaces ethernet eth0
+ set firewall in name WAN_TO_LAN
+ 
+edit interfaces ethernet eth1 vif 172
+ set firewall in name GUEST_TO_LAN 
+ set firewall local name GUEST_TO_LOCAL
+ 
+Misc Settings
+==================================================
+edit service dhcp-server shared-network-name GUEST 
+ set subnet 172.16.0.0/24 default-router 172.16.0.1
+ set subnet 172.16.0.0/24 start 172.16.0.10 stop 172.16.0.150
+ set subnet 172.16.0.0/24 dns-server 172.16.0.1
+ set subnet 172.16.0.0/24 lease 28800
+
+edit service dhcp-server shared-network-name LAN 
+ set subnet 10.0.0.0/24 default-router 10.0.0.1
+ set subnet 10.0.0.0/24 start 10.0.0.10 stop 10.0.0.150
+ set subnet 10.0.0.0/24 dns-server 10.0.0.1
+ set subnet 10.0.0.0/24 lease 28800 
+ 
+set service dns forwarding listen-on eth1.10
+set service dns forwarding listen-on eth1.172
+set service dns forwarding name-server 8.8.8.8
