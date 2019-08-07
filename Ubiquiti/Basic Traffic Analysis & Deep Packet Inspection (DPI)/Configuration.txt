@@ -1,0 +1,14 @@
+Traffic Analysis with DPI
+|-----------------------|
+set system traffic-analysis dpi enable
+set system traffic-analysis export enable
+
+Traffic Analysis without DPI
+|--------------------------|
+set system traffic-analysis dpi disable
+set system traffic-analysis export enable
+
+#Verify
+show ubnt offload
+
+https://www.youtube.com/c/+BenPin
