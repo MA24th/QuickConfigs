@@ -1,0 +1,41 @@
+Port Forwarding
+==========================================
+edit port-forward
+ set auto-firewall disable
+ set lan-interface eth1
+ set wan-interface eth0
+ 
+ set rule 1 description "80_TO_WEBSERVER"
+ set rule 1 protocol tcp
+ set rule 1 original-port 80
+ set rule 1 forward-to address 10.0.0.100
+ set rule 1 forward-to port 80
+ 
+ set rule 2 description "8080_TO_WEBSERVER"
+ set rule 2 protocol tcp
+ set rule 2 original-port 8080
+ set rule 2 forward-to address 10.0.0.100
+ set rule 2 forward-to port 80
+ 
+Firewall Entries
+==========================================
+edit firewall name WAN_TO_LAN 
+ set default-action drop
+ 
+ set rule 1 action accept
+ set rule 1 description PortForward
+ set rule 1 log disable
+ set rule 1 protocol tcp
+ set rule 1 destination port 80
+ 
+ set rule 2 action accept
+ set rule 2 description Established
+ set rule 2 log disable
+ set rule 2 protocol all
+ set rule 2 state established enable
+ set rule 2 state related enable 
+ 
+Apply to Interface 
+==========================================
+edit interfaces ethernet eth0
+ set firewall in name WAN_TO_LAN
