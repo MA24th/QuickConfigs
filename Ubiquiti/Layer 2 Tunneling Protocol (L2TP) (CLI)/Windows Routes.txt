@@ -1,0 +1,14 @@
+Windows L2TP Settings
+==================================================
+Allow these protocols -> MS-CHAP v2
+
+Add route to Windows
+==================================================
+1. route print -4
+2. determine PPTP vpn interface ID (32 in my case)
+3. route add 10.0.0.0 mask 255.255.255.0 0.0.0.0 IF 32
+
+Optionally create a batch (.bat) file
+==================================================
+rasdial Edgerouter vpnbpin Pa$$w0rd
+route add 10.0.0.0 mask 255.255.255.0 0.0.0.0 IF 32

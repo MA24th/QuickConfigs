@@ -1,0 +1,77 @@
+L2TP
+==================================================
+edit vpn
+ set ipsec ipsec-interfaces interface eth0
+ set ipsec nat-networks allowed-network 0.0.0.0/0
+ set l2tp remote-access authentication mode local
+ set l2tp remote-access authentication local-users username vpnbpin password Pa$$w0rd
+ set l2tp remote-access client-ip-pool start 172.16.0.200
+ set l2tp remote-access client-ip-pool stop 172.16.0.220
+ set l2tp remote-access ipsec-settings authentication mode pre-shared-secret
+ set l2tp remote-access ipsec-settings authentication pre-shared-secret Pa$$w0rd
+ set l2tp remote-access ipsec-settings ike-lifetime 3600
+ set l2tp remote-access outside-address 2.0.0.1
+ set l2tp remote-access mtu 1450
+ 
+Firewall Rule L2TP
+==========================================
+edit firewall name VPN
+ set default-action drop
+ set rule 1 action accept
+ set rule 1 description IKE
+ set rule 1 destination port 500
+ set rule 1 log disable
+ set rule 1 protocol udp
+ set rule 1 source address 100.0.0.1
+  
+ set rule 2 action accept
+ set rule 2 description L2TP
+ set rule 2 destination port 1701
+ set rule 2 log disable
+ set rule 2 protocol udp
+ set rule 2 source address 100.0.0.1
+
+ set rule 3 action accept
+ set rule 3 description ESP
+ set rule 3 log disable
+ set rule 3 protocol esp
+ set rule 3 source address 100.0.0.1
+ 
+ set rule 4 action accept
+ set rule 4 description SSH
+ set rule 4 destination port 22
+ set rule 4 log disable
+ set rule 4 protocol tcp
+ set rule 4 source address 100.0.0.1
+
+ set rule 5 action accept
+ set rule 5 description HTTPS
+ set rule 5 destination port 443
+ set rule 5 log disable
+ set rule 5 protocol tcp
+ set rule 5 source address 100.0.0.1 
+
+Default WAN_TO_LAN Rule
+==========================================
+edit firewall name WAN_TO_LAN 
+ set default-action drop
+ set rule 1 action accept
+ set rule 1 description Established
+ set rule 1 log disable
+ set rule 1 protocol all
+ set rule 1 state established enable
+ set rule 1 state invalid disable
+ set rule 1 state new disable
+ set rule 1 state related enable 
+ 
+Apply to Interface 
+==========================================
+edit interfaces ethernet eth0
+ set firewall in name WAN_TO_LAN
+ set firewall local name VPN
+ 
+Verify
+==================================================
+show vpn remote-access 
+show vpn ipsec sa
+show vpn log
