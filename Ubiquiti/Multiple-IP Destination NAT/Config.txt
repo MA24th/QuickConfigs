@@ -1,0 +1,36 @@
+Basic Configuration
+==================================================
+edit interfaces
+ set ethernet eth0 address 2.0.0.1/24
+ set ethernet eth0 description WAN
+
+ set ethernet eth1 address 10.0.0.1/24
+ set ethernet eth0 description LAN
+
+Destination NAT Rules
+==================================================
+edit service nat
+ set rule 1 description HTTP_100
+ set rule 1 inside-address address 10.0.0.100
+ set rule 1 inside-address port 80
+ set rule 1 destination address 2.0.0.100
+ set rule 1 destination port 80
+ set rule 1 inbound-interface eth0
+ set rule 1 log disable
+ set rule 1 protocol tcp
+ set rule 1 type destination
+
+ set rule 2 description HTTP_1
+ set rule 2 inside-address address 10.0.0.100
+ set rule 2 inside-address port 80
+ set rule 2 destination address 2.0.0.1
+ set rule 2 destination port 80
+ set rule 2 inbound-interface eth0
+ set rule 2 log disable
+ set rule 2 protocol tcp
+ set rule 2 type destination
+
+Assign Multiple IPs to External Interface
+==================================================
+edit interfaces ethernet eth0
+ set address 2.0.0.100/24
