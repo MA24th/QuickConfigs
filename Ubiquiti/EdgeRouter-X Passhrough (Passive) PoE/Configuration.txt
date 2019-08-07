@@ -1,0 +1,17 @@
+Passthrough PoE
+!-------------!
+edit interfaces ethernet eth4 
+ set poe output pthru
+ top ; commit
+ 
+PoE Watchdog
+!----------!
+edit interfaces ethernet eth4 
+ set poe watchdog address 192.168.1.x
+ set poe watchdog failure-count 3
+ set poe watchdog interval 15
+ set poe watchdog off-delay 5
+ set poe watchdog start-delay 300
+ top ; commit
+ 
+show interfaces ethernet poe watchdog
