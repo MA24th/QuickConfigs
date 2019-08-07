@@ -1,0 +1,6 @@
+Basic WAN Limit Smart Queue QoS
+|-----------------------------|
+edit traffic-control smart-queue SHAPER
+ set wan-interface eth0
+ set upload rate 420kbit
+ set download rate 5.2mbit
