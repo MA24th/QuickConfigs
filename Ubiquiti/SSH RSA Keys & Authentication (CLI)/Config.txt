@@ -1,0 +1,9 @@
+Disable SSH Password Authentication
+====================================
+edit service ssh 
+ set disable-password-authentication
+
+Load RSA Public Key
+==================================== 
+loadkey bpin ~/PASS.pub
+loadkey bpin ~/NOPASS.pub
