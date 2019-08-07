@@ -1,0 +1,16 @@
+SNMPv3 AuthPriv (Authentication & Encryption)
+==================================================
+edit service snmp
+ set listen-address 10.0.0.1 port 161
+ set v3 view VIEW oid 1
+ 
+ set v3 group SNMP view VIEW
+ set v3 group SNMP mode ro
+ set v3 group SNMP seclevel priv
+ 
+ set v3 user USER group SNMP
+ set v3 user USER mode ro
+ set v3 user USER auth plaintext-key Pa$$w0rd
+ set v3 user USER auth type sha
+ set v3 user USER privacy plaintext-key Pa$$w0rd
+ set v3 user USER privacy type aes
