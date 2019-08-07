@@ -1,0 +1,15 @@
+Route-Maps & Prefix-Lists
+====================================
+edit policy prefix-list LOOPBACKS
+ set rule 1 prefix 11.0.0.0/22
+ set rule 1 ge 24
+ set rule 1 le 24
+ set rule 1 action permit
+
+edit policy route-map OSPF 
+ set rule 1 match ip address prefix-list LOOPBACKS
+ set rule 1 action permit
+ 
+edit protocols ospf
+ set redistribute connected route-map OSPF
+ set redistribute connected metric-type 2

@@ -1,0 +1,24 @@
+Cisco Config
+============================================
+interface gi0/0 
+ ip address 10.0.13.3 255.255.255.0
+ ip ospf network point-to-point
+ no shutdown
+ 
+router ospf 1
+ router-id 3.3.3.3
+ network 10.0.13.0 0.0.0.255 area 0
+ passive-interface default
+ no passive-interface gi0/0
+
+SRX Config
+============================================
+set interfaces fe-0/0/0 unit 0 family inet address 10.0.12.2/30
+
+set routing-options router-id 2.2.2.2
+
+edit protocols ospf area 0.0.0.12
+ set interface fe-0/0/0.0 interface-type p2p
+edit security zones security-zone trust
+ set interface fe-0/0/0.0
+ set host-inbound-traffic protocols ospf
