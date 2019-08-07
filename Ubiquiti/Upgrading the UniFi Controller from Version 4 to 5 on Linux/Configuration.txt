@@ -1,0 +1,50 @@
+UniFi Re-Installation / Upgrade
+!-----------------------------!
+#This part assumes that you have already installed UniFi v4 Stable
+
+nano /etc/apt/sources.list
+
+#This should be in the sources list:
+#UniFi v4 Stable
+deb http://www.ubnt.com/downloads/unifi/debian stable ubiquiti
+
+#Uncomment/remove above and add:
+#UniFi v5 
+deb http://www.ubnt.com/downloads/unifi/debian unifi5 ubiquiti
+
+tail /etc/apt/sources.list
+
+#This key should already be added if you have installed UniFi v4 Stable
+apt-key adv --keyserver keyserver.ubuntu.com --recv C0A52C50
+
+apt-get update
+
+#If you have previously disabled the UniFi update (hold), unhold the package:
+apt-mark unhold unifi
+
+#Verify the unhold (should be ii, not hi)
+dpkg -l | grep unifi
+
+#Stop the UniFi service
+service unifi stop
+
+apt-get upgrade
+
+reboot
+
+Verify UniFi Installation
+!-----------------------!
+systemctl status unifi
+
+https://192.168.1.10:8443
+
+apt-get install nmap
+
+nmap localhost
+
+#nmap should show
+8080/tcp open  http-proxy
+8443/tcp open  https-alt
+
+#After upgrade you can put the UniFi package on hold again
+apt-mark hold unifi
