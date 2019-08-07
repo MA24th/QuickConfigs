@@ -1,0 +1,62 @@
+PPTP
+==================================================
+edit vpn pptp remote-access 
+ set authentication mode local
+ set authentication local-users username vpnbpin password Pa$$w0rd
+ set client-ip-pool start 172.16.0.200
+ set client-ip-pool stop 172.16.0.220
+ ;set dhcp-interface eth0
+ set outside-address 2.0.0.1
+ set mtu 1024
+ set dns-servers server-1 10.0.0.100
+ set dns-servers server-2 8.8.8.8
+ 
+Firewall Rule PPTP
+==========================================
+edit firewall name VPN
+ set default-action drop
+ set rule 1 action accept
+ set rule 1 description PPTP
+ set rule 1 destination port 1723
+ set rule 1 log disable
+ set rule 1 protocol tcp
+ set rule 1 source address 100.0.0.1
+  
+ set rule 2 action accept
+ set rule 2 description GRE
+ set rule 2 log disable
+ set rule 2 protocol gre
+ set rule 2 source address 100.0.0.1
+ 
+ set rule 3 action accept
+ set rule 3 description SSH
+ set rule 3 destination port 22
+ set rule 3 log disable
+ set rule 3 protocol tcp
+ set rule 3 source address 100.0.0.1
+
+ set rule 4 action accept
+ set rule 4 description HTTPS
+ set rule 4 destination port 443
+ set rule 4 log disable
+ set rule 4 protocol tcp
+ set rule 4 source address 100.0.0.1
+ 
+Default WAN_TO_LAN Rule
+==========================================
+edit firewall name WAN_TO_LAN 
+ set default-action drop
+ set rule 1 action accept
+ set rule 1 description Established
+ set rule 1 log disable
+ set rule 1 protocol all
+ set rule 1 state established enable
+ set rule 1 state invalid disable
+ set rule 1 state new disable
+ set rule 1 state related enable
+ 
+Apply to Interface 
+==========================================
+edit interfaces ethernet eth0
+ set firewall in name WAN_TO_LAN
+ set firewall local name VPN
