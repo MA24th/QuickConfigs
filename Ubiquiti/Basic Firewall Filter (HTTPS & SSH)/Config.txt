@@ -1,0 +1,26 @@
+HTTPS & SSH Rules
+==========================================
+edit firewall name MGMT
+ set default-action drop
+ set description 'Limit Management Access'
+ 
+ set rule 1 action accept
+ set rule 1 description SSH
+ set rule 1 destination port 22
+ set rule 1 log enable
+ set rule 1 protocol tcp
+ set rule 1 source address 10.0.0.11
+  
+ set rule 2 action accept
+ set rule 2 description HTTPS
+ set rule 2 destination port 443
+ set rule 2 log enable
+ set rule 2 protocol tcp
+ set rule 2 source address 10.0.0.10
+
+Apply to Interface
+==========================================
+edit interfaces ethernet eth1
+ set description LAN
+ set address 10.0.0.1/24
+ set firewall local name MGMT
