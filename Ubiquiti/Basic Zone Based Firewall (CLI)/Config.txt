@@ -1,0 +1,44 @@
+Zones
+==================================================
+edit zone-policy
+ set zone WAN default-action drop
+ set zone WAN from LAN firewall name LAN_TO_ALL
+ set zone WAN from LOCAL firewall name LOCAL_TO_ALL
+ set zone WAN interface eth0
+ 
+ set zone LAN default-action drop
+ set zone LAN from WAN firewall name WAN_TO_LAN
+ set zone LAN from LOCAL firewall name LOCAL_TO_ALL
+ set zone LAN interface eth1
+ 
+ set zone LOCAL default-action drop
+ set zone LOCAL from WAN firewall name WAN_TO_LOCAL
+ set zone LOCAL from LAN firewall name LAN_TO_ALL
+ set zone LOCAL local-zone
+
+Firewall Rules
+==================================================
+edit firewall name WAN_TO_LAN 
+ set default-action drop
+ set rule 1 action accept
+ set rule 1 description Established
+ set rule 1 log disable
+ set rule 1 protocol all
+ set rule 1 state established enable
+ set rule 1 state invalid disable
+ set rule 1 state new disable
+ set rule 1 state related enable 
+
+edit firewall name WAN_TO_LOCAL
+ set default-action drop
+ set rule 1 action accept
+ set rule 1 description Established
+ set rule 1 log disable
+ set rule 1 protocol all
+ set rule 1 state established enable
+ set rule 1 state invalid disable
+ set rule 1 state new disable
+ set rule 1 state related enable
+ 
+set firewall name LAN_TO_ALL default-action accept
+set firewall name LOCAL_TO_ALL default-action accept
