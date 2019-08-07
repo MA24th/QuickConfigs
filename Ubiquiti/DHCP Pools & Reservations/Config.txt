@@ -1,0 +1,40 @@
+Default Login
+==================================================
+Username: ubnt
+Password: ubnt
+
+Configuration Steps
+==================================================
+1. Associate interface with IP address
+2. Create DHCP pool
+3. Create reservations manually or 'Map Static IP'
+
+Step 1
+==================================================
+set interfaces ethernet eth1 address 10.0.0.254/24 
+
+Step 2
+==================================================
+edit service dhcp-server shared-network-name LOCAL 
+ set subnet 10.0.0.0/24 start 10.0.0.10 stop 10.0.0.150
+ set subnet 10.0.0.0/24 default-router 10.0.0.254
+ set subnet 10.0.0.0/24 dns-server 1.1.1.1
+ set subnet 10.0.0.0/24 lease 28800
+
+Step 3
+==================================================
+edit service dhcp-server shared-network-name LOCAL  
+ set subnet 10.0.0.0/24 static-mapping XP ip-address 10.0.0.99
+ set subnet 10.0.0.0/24 static-mapping XP mac-address '08:00:27:85:71:5e'
+
+Helpful Commands
+==================================================
+show dhcp leases
+show dhcp leases expired
+show dhcp statistics
+
+clear dhcp leases
+clear dhcp lease ip 10.0.0.10
+
+show configuration
+show configuration commands
