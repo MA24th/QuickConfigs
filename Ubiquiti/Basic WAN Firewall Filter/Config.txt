@@ -1,0 +1,24 @@
+Basic WAN_TO_LAN Rule
+====================================
+edit firewall name WAN_TO_LAN 
+ set default-action drop
+ set rule 1 action accept
+ set rule 1 description Established
+ set rule 1 log disable
+ set rule 1 protocol all
+ set rule 1 state established enable
+ set rule 1 state invalid disable
+ set rule 1 state new disable
+ set rule 1 state related enable
+
+Apply to Interface
+====================================
+edit interfaces ethernet eth0
+ set firewall in name WAN_TO_LAN
+ set firewall local name WAN_TO_LAN
+ 
+Optional
+====================================
+edit service
+ set gui listen-address 10.0.0.1
+ set ssh listen-address 10.0.0.1 
