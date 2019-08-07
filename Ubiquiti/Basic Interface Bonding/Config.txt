@@ -1,0 +1,11 @@
+Bonding interfaces
+==================================================
+edit interfaces bonding bond0
+ set address 10.0.12.1/30
+ set mode 802.3ad
+
+set interfaces ethernet eth1 bond-group bond0
+set interfaces ethernet eth2 bond-group bond0
+ 
+show interfaces bonding  
+show interfaces bonding brief
