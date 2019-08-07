@@ -1,0 +1,8 @@
+Port Mirroring
+===========================================
+edit interfaces
+ set ethernet eth1 address 10.0.0.1/24
+ set ethernet eth1 description SOURCE
+ set ethernet eth1 mirror eth0
+ 
+ set ethernet eth0 description DESTINATION
