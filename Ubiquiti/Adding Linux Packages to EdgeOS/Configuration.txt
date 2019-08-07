@@ -1,0 +1,11 @@
+Add Wheezy Repository
+!-------------------!
+set system package repository wheezy components 'main contrib non-free'
+set system package repository wheezy distribution wheezy 
+set system package repository wheezy url http://http.us.debian.org/debian
+
+#Update Sources
+sudo apt-get update
+
+#See installed packages
+sudo dkpg -l
