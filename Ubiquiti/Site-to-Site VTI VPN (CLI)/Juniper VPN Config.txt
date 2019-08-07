@@ -1,0 +1,60 @@
+Default Interfaces
+==================================================
+edit interfaces
+ set fe-0/0/0 unit 0 family inet address 1.0.0.1/24
+ set fe-0/0/1 unit 0 family inet address 172.16.0.1/24
+ 
+set routing-options static route 0.0.0.0/0 next-hop 1.0.0.2
+
+VTI Interface
+================================================== 
+edit interfaces
+ set st0 unit 0 family inet mtu 1400
+ set st0 unit 0 family inet address 12.0.0.1/30
+ 
+set routing-options static route 10.0.0.0/24 next-hop 12.0.0.2
+ 
+VPN Tunnel
+================================================
+edit security 
+ set ike proposal IKE authentication-method pre-shared-keys
+ set ike proposal IKE dh-group group14
+ set ike proposal IKE authentication-algorithm md5
+ set ike proposal IKE encryption-algorithm aes-128-cbc
+ set ike proposal IKE lifetime-seconds 28800
+ set ike policy IKE_POLICY mode main
+ set ike policy IKE_POLICY proposals IKE
+ set ike policy IKE_POLICY pre-shared-key ascii-text Pa$$w0rd
+ set ike gateway IKE_GATEWAY ike-policy IKE_POLICY
+ set ike gateway IKE_GATEWAY address 2.0.0.1
+ set ike gateway IKE_GATEWAY external-interface fe-0/0/0
+ set ike gateway IKE_GATEWAY local-address 1.0.0.1
+ 
+ set ipsec proposal ESP protocol esp
+ set ipsec proposal ESP authentication-algorithm hmac-md5-96
+ set ipsec proposal ESP encryption-algorithm aes-128-cbc
+ set ipsec proposal ESP lifetime-seconds 3600
+ set ipsec policy ESP_POLICY proposals ESP
+ set ipsec vpn ESP_VPN bind-interface st0.0
+ set ipsec vpn ESP_VPN ike gateway IKE_GATEWAY
+ set ipsec vpn ESP_VPN ike ipsec-policy ESP_POLICY
+ set ipsec vpn ESP_VPN establish-tunnels immediately
+
+Security Settings
+==================================================
+set security zones security-zone trust interfaces st0.0
+
+edit security policies from-zone trust to-zone trust 
+ set policy trust-to-trust match source-address any
+ set policy trust-to-trust match destination-address any
+ set policy trust-to-trust match application any
+ set policy trust-to-trust then permit
+ 
+Verify 
+==================================================
+show security ike security-associations
+show security ike security-associations detail
+
+show security ipsec sa
+show security ipsec sa detail
+show security ipsec statistics
