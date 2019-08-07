@@ -1,0 +1,23 @@
+Virtual Interfaces (VIF)
+==================================================
+edit interfaces 
+ set ethernet eth1 vif 10 address 10.0.0.1/24
+ set ethernet eth1 vif 172 address 172.16.0.1/24
+
+Misc Settings
+==================================================
+set service dns forwarding listen-on eth1.10
+set service dns forwarding listen-on eth1.172
+set service dns forwarding name-server 8.8.8.8
+
+edit service dhcp-server shared-network-name 10_LAN 
+ set subnet 10.0.0.0/24 default-router 10.0.0.1
+ set subnet 10.0.0.0/24 start 10.0.0.10 stop 10.0.0.150
+ set subnet 10.0.0.0/24 dns-server 10.0.0.1
+ set subnet 10.0.0.0/24 lease 28800
+ 
+edit service dhcp-server shared-network-name 172_LAN 
+ set subnet 172.16.0.0/24 default-router 172.16.0.1
+ set subnet 172.16.0.0/24 start 172.16.0.10 stop 172.16.0.150
+ set subnet 172.16.0.0/24 dns-server 172.16.0.1
+ set subnet 172.16.0.0/24 lease 28800 
