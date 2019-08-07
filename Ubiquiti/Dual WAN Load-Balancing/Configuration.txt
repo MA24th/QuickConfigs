@@ -1,0 +1,120 @@
+WAN interfaces
+!------------!
+edit interfaces ethernet eth0 
+ set pppoe 0 mtu 1492
+ set pppoe 0 user-id ERX0
+ set pppoe 0 password Pa$$w0rd
+ set pppoe 0 name-server none
+ set pppoe 0 default-route none
+ set pppoe 0 firewall in name WAN_IN
+ set pppoe 0 firewall local name WAN_LOCAL
+
+top
+
+edit interfaces ethernet eth1 
+ set address dhcp
+ set dhcp-options name-server no-update
+ set dhcp-options default-route-distance 1
+ set firewall in name WAN_IN
+ set firewall local name WAN_LOCAL
+
+set protocols static interface-route 0.0.0.0/0 next-hop-interface pppoe0
+
+set system name-server 8.8.8.8
+
+set firewall options mss-clamp mss 1452
+
+Load-Balancing Defaults
+!---------------------!
+edit firewall group network-group PRIVATE_NETS
+ set network 192.168.0.0/16
+ set network 172.16.0.0/12
+ set network 10.0.0.0/8
+
+top 
+ 
+edit firewall modify balance
+ set rule 10 action modify
+ set rule 10 description 'do NOT load balance lan to lan'
+ set rule 10 destination group network-group PRIVATE_NETS
+ set rule 10 modify table main
+ set rule 20 action modify
+ set rule 20 description 'do NOT load balance destination public address'
+ set rule 20 destination group address-group ADDRv4_pppoe0
+ set rule 20 modify table main
+ set rule 30 action modify
+ set rule 30 description 'do NOT load balance destination public address'
+ set rule 30 destination group address-group ADDRv4_eth1
+ set rule 30 modify table main
+ set rule 70 action modify
+ set rule 70 modify lb-group G
+
+top
+
+edit interfaces switch switch0 
+ set address 192.168.1.1/24
+ set firewall in modify balance
+ set switch-port interface eth2
+ set switch-port interface eth3
+ set switch-port interface eth4
+
+top 
+
+edit load-balance group G
+ set interface eth1
+ set interface pppoe0
+ set lb-local enable
+
+edit service nat
+ set rule 5000 description 'masquerade for WAN'
+ set rule 5000 outbound-interface pppoe0
+ set rule 5000 type masquerade
+ set rule 5002 description 'masquerade for WAN 2'
+ set rule 5002 outbound-interface eth1
+ set rule 5002 type masquerade
+
+top 
+
+edit system conntrack 
+ set expect-table-size 4096
+ set hash-size 4096
+ set table-size 32768
+ set tcp half-open-connections 512
+ set tcp loose enable
+ set tcp max-retrans 3
+
+top ; commit
+
+Change Load-Balancing Defaults
+!----------------------------!
+edit load-balance group G
+
+ set sticky dest-addr enable
+
+ set interface pppoe0 route-test type ping target 8.8.8.8
+ set interface pppoe0 route-test interval 5
+ set interface pppoe0 route-test initial-delay 15
+ 
+ set interface eth1 route-test type ping target 8.8.8.8 
+ set interface eth1 route-test interval 5
+ set interface eth1 route-test initial-delay 15
+
+Influence Weighting
+!-----------------!
+edit load-balance group G 
+ set interface pppoe0 weight 67
+ set interface eth1 weight 33
+
+Set one link to failover only
+!---------------------------!
+edit load-balance group G 
+ set interface eth1 failover-only
+ 
+Verify Load-Balancing
+!-------------------!
+show ip route
+show load-balance status
+show load-balance watchdog
+
+show ip route table 201
+show ip route table 202
