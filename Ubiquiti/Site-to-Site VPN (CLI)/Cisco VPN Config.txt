@@ -1,0 +1,44 @@
+Interfaces
+==================================================
+interface gi0/0
+ ip address 1.0.0.1 255.255.255.0
+ no shutdown
+interface gi1/0
+ ip address 172.16.0.1 255.255.255.0
+ no shutdown
+ 
+ip route 0.0.0.0 0.0.0.0 1.0.0.2
+ 
+Crypto Map VPN
+================================================
+crypto isakmp policy 10
+ encr aes
+ hash md5
+ authentication pre-share
+ group 14
+ lifetime 28800
+ 
+crypto isakmp key Pa$$w0rd address 2.0.0.1        
+
+crypto ipsec transform-set TS esp-aes esp-md5-hmac 
+ mode tunnel
+ 
+crypto map CMAP 10 ipsec-isakmp 
+ set peer 2.0.0.1
+ set transform-set TS 
+ match address VPN
+ set security-association lifetime seconds 3600
+
+ip access-list extended VPN 
+ permit ip 172.16.0.0 0.0.0.255 10.0.0.0 0.0.0.255
+
+int g0/0 
+ crypto map CMAP
+
+Verify 
+==================================================
+show crypto isakmp sa
+show crypto ipsec sa
+show crypto engine connections active
+
+debug crypto isakmp
