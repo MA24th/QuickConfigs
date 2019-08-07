@@ -1,0 +1,20 @@
+Enable Interfaces for OSPF
+====================================
+edit interfaces ethernet eth1
+ set address 10.0.12.1/30
+ set ip ospf network point-to-point
+ set description TO_SRX
+
+edit interfaces ethernet eth2
+ set address 10.0.13.1/24
+ set description TO_CISCO
+ 
+Advertise Networks
+====================================
+edit protocols ospf
+ set area 0 network 10.0.12.0/24
+ set area 0 network 10.0.13.0/30
+ set parameters router-id 1.1.1.1
+ set passive-interface default
+ set passive-interface-exclude eth1
+ set passive-interface-exclude eth2
