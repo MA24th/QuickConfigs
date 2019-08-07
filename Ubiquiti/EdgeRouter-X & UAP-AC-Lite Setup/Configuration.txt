@@ -1,0 +1,16 @@
+Hardware Offloading
+!-----------------!
+configure
+set system offload hwnat enable
+
+commit
+save 
+exit
+
+reboot
+
+show ubnt offload
+
+Reset to Factory Defaults
+!-----------------------!
+cp /opt/vyatta/etc/config.boot.default /config/config.boot

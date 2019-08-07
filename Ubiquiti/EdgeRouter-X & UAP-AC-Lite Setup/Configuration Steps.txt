@@ -1,0 +1,25 @@
+Configuration Steps Part #1
+!-------------------------!
+Power EdgeRouter-X using provided 12V power brick
+Attach computer to Eth0 interface using standard (cat5e / cat6) UTP cable
+Attach UAP-AC-LITE to Eth4 interface using standard (cat5e / cat6) UTP cable
+Assign a static IP address to your PCs ethernet adapter
+Open browser and navigate to http://192.168.1.1
+Complete the basic wizard and reboot the device
+
+Configuration Steps Part #2
+!-------------------------!
+After reboot, remove static IP address from your PCs ethernet adapter > DHCP
+Unplug PC from Eth0 and re-attach to Eth1, Eth2 or Eth3 interface
+Attach your Modem’s LAN interface to the ‘LAN’ port on the PoE-Injector
+Attach the PoE-Injector ‘PoE’ port to the Eth0 interface of the EdgeRouter-X
+Unplug the 12V power brick, the EdgeRouter will remain powered
+
+Verify PCs IP address now given through DHCP
+Open browser and navigate to http://192.168.1.1
+Enable HWNAT Offloading through webpage or CLI
+Reboot the EdgeRouter-X 
+
+Enable passthrough PoE on the Eth4 interface, the UAP will now come online
+Verify presence of UAP-AC-LITE using the ‘UBNT Device Discovery Tool’
+Install controller on desired location and adopt UAP
