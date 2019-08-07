@@ -1,0 +1,6 @@
+SNMPv2c
+==================================================
+edit service snmp
+ set community ABCDE12345ABCDE client 10.0.0.10
+ set community ABCDE12345ABCDE authorization ro
+ set listen-address 10.0.0.1 port 161
