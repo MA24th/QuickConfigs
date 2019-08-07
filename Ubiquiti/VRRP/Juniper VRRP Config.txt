@@ -1,0 +1,16 @@
+VRRP
+===============================================
+edit interfaces fe-0/0/1.0
+ set description LAN
+ edit family inet address 10.0.0.2/24
+  set vrrp-group 12 preempt
+  set vrrp-group 12 priority 100
+  set vrrp-group 12 authentication-type simple
+  set vrrp-group 12 authentication-key Pa$$w0rd
+  set vrrp-group 12 virtual-address 10.0.0.254 
+
+Verify
+===============================================
+show vrrp
+show vrrp extensive
+show vrrp summary 

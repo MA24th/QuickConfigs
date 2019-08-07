@@ -1,0 +1,18 @@
+VRRP
+=============================================
+edit interfaces ethernet eth1
+ set address 10.0.0.1/24
+ set description LAN
+ edit vrrp vrrp-group 12 
+  set priority 100
+  set preempt true
+  set authentication type plaintext-password
+  set authentication password Pa$$w0rd
+  set virtual-address 10.0.0.254/24
+
+Verify
+=============================================
+show vrrp
+show vrrp summary
+
+clear vrrp master interface eth1 group 12

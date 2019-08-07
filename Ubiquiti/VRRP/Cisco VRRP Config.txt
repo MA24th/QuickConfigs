@@ -1,0 +1,10 @@
+VRRP
+===============================
+int g1/0
+ ip add 10.0.0.2 255.255.255.0
+ description LAN
+ no shutdown
+ vrrp 12 preempt
+ vrrp 12 priority 100
+ vrrp 12 ip 10.0.0.254 
+ vrrp 12 authentication Pa$$w0rd
