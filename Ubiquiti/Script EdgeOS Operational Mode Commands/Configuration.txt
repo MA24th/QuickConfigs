@@ -1,0 +1,19 @@
+Create Basic Script
+!-----------------!
+sudo vi /config/scripts/dhcp
+#!/bin/bash
+run=/opt/vyatta/bin/vyatta-op-cmd-wrapper
+$run release dhcp interface eth0
+$run renew dhcp interface eth0
+/bin/sleep 10
+$run show interfaces
+$run ping www.youtube.com
+
+#Make script executable
+chmod +x /config/scripts/dhcp
+
+#Verify script
+cat /config/scripts/dhcp
+
+#Run script
+/config/scripts/dhcp
