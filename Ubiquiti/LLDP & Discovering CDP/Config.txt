@@ -1,0 +1,6 @@
+LLDP & CDP
+======================================
+set service lldp
+set service lldp legacy-protocols cdp
+
+show lldp neighbors
