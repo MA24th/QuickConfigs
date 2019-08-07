@@ -1,0 +1,13 @@
+Capture with CLI
+!---------------!
+show interface ethernet eth0 capture
+
+Capture with TCPdump
+!-----------------------!
+sudo tcpdump -i switch0 host <ip-address>
+
+sudo tcpdump -i eth0 net <ip-network>/24 -w /home/ubnt/file.pcap -c 10
+
+#Connect via WinSCP
+#Copy over capture file
+#Open in WireShark
