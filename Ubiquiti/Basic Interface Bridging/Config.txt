@@ -1,0 +1,27 @@
+Bridge Interface
+==================================================
+edit interfaces
+ set bridge br0 address 10.0.0.1/24
+ set bridge br0 stp false
+ set bridge br0 description BRIDGEDLAN
+ 
+ set ethernet eth1 bridge-group bridge br0
+ set ethernet eth1 description BRIDGEDLAN
+
+ set ethernet eth2 bridge-group bridge br0
+ set ethernet eth2 description BRIDGEDLAN
+
+ set ethernet eth0 address 2.0.0.1/30
+ set ethernet eth0 description WAN
+ 
+DHCP Services
+==================================================
+edit service dhcp-server shared-network-name BRIDGEDLAN
+ set subnet 10.0.0.0/24 start 10.0.0.10 stop 10.0.0.150
+ set subnet 10.0.0.0/24 default-router 10.0.0.1
+ set subnet 10.0.0.0/24 dns-server 10.0.0.1
+ set subnet 10.0.0.0/24 dns-server 8.8.8.8
+ set subnet 10.0.0.0/24 lease 28800
+ 
+set service dns forwarding listen-on br0
+set service dns forwarding name-server 8.8.8.8
