@@ -1,0 +1,34 @@
+System Management
+==================================================
+edit service
+ set telnet port 23
+ set telnet listen-address 10.0.0.1
+ set gui https-port 8443
+ 
+User Management
+==================================================
+edit system login 
+ set user bpin level operator 
+ set user bpin authentication plaintext-password Pa$$w0rd
+ delete system login user ubnt
+
+Root Account 
+================================================== 
+sudo -i
+
+edit system login
+ set user root authentication plaintext-password Pa$$w0rd
+
+set service telnet allow-root 
+
+Limit Access
+==================================================
+edit firewall name MGMT
+ set default-action drop
+ set rule 1 action accept
+ set rule 1 destination port 23
+ set rule 1 log disable
+ set rule 1 protocol tcp
+ set rule 1 source address 10.0.0.99/32
+ 
+set interfaces ethernet eth1 firewall local name MGMT
