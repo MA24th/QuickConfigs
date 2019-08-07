@@ -1,0 +1,24 @@
+Restore to Factory Defaults
+==================================================
+cp /opt/vyatta/etc/config.boot.default /config/config.boot
+
+Configurations & Saving
+==================================================
+save
+load config.boot
+
+save alternateconfig.boot
+load alternateconfig.boot
+
+sudo -i
+ls -l /config/
+cat /config/config.boot
+vi /config/config.boot
+
+cat /config/alternateconfig.boot
+vi /config/alternateconfig.boot
+
+Edit Factory Default Configuration
+==================================================
+sudo -i
+vi /opt/vyatta/etc/config.boot.default
