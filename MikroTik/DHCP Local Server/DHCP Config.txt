@@ -1,0 +1,13 @@
+/interface bridge
+add name=BR-LAN
+/interface bridge port
+add bridge=BR-LAN interface=wlan0
+/ip address
+add address=192.168.1.1/24 interface=BR-LAN network=192.168.1.0
+/ip pool
+add name=dhcp_pool0 ranges=192.168.1.2-192.168.1.254
+/ip dhcp-server network
+add address=192.168.1.0/24 dns-server=192.168.1.1,1.1.1.1,8.8.8.8 gateway=\
+    192.168.1.1
+/ip dhcp-server
+add address-pool=dhcp_pool0 disabled=no interface=BR-LAN name=dhcp1
