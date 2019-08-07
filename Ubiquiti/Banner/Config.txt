@@ -1,0 +1,7 @@
+Pre-Login Banner
+==================================================
+set system login banner pre-login "**********************************************************************\n\n\tThis system is for the use of authorized clients only.\n\tIndividuals using the computer network system without\n\tany authorization, or in excess of their authorization,\n\tare subject to having all their activity monitored and\n\trecorded by system personnel. To protect the environment\n\tfrom unauthorized use and to ensure the computer system\n\tis functioning properly, system technicians continously\n\tmonitor the network environment for unauthorized usage.\n\n\tUnauthorized access is a violation of criminal, civil,\n\tstate and federal laws.\n\n**********************************************************************\n\n"
+
+Post-Login Banner
+==================================================
+set system login banner post-login "You are logged on to Edgerouter-X 5-Port with version v1.9.0\n"
