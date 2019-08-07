@@ -1,0 +1,11 @@
+Switch Interface
+=============================================
+edit interfaces switch switch0
+ set vif 10 address 10.0.0.1/24
+ set vif 172 address 172.16.0.1/24
+ set switch-port interface eth1 vlan vid 10
+ set switch-port interface eth1 vlan vid 172
+ set switch-port interface eth2 vlan pvid 10
+ set switch-port interface eth3 vlan pvid 172
+ set switch-port vlan-aware enable
+ set mtu 1500
