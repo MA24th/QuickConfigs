@@ -1,0 +1,113 @@
+OpenVPN Certificates
+==================================================
+sudo -i
+cd /usr/lib/ssl/misc
+./CA.sh -newca
+	Passphrase				  = Pa$$w0rd
+	countryName               = NL
+	stateOrProvinceName       = QUICKCONFIGS
+	organizationName          = QUICKCONFIGS
+	organizationalUnitName    = QUICKCONFIGS
+	commonName                = ROOT
+	
+cp demoCA/cacert.pem /config/auth
+cp demoCA/private/cakey.pem /config/auth
+
+./CA.sh -newreq
+./CA.sh -sign
+	countryName               = NL
+	stateOrProvinceName       = QUICKCONFIGS
+	localityName              = QUICKCONFIGS
+	organizationName          = QUICKCONFIGS
+	organizationalUnitName    = QUICKCONFIGS
+	commonName                = SERVER
+
+mv newcert.pem /config/auth/SERVER.pem
+mv newkey.pem /config/auth/SERVER.key
+
+openssl dhparam -out /config/auth/DH.pem -2 1024
+
+./CA.sh -newreq
+./CA.sh -sign
+	countryName               = NL
+	stateOrProvinceName       = QUICKCONFIGS
+	localityName              = QUICKCONFIGS
+	organizationName          = QUICKCONFIGS
+	organizationalUnitName    = QUICKCONFIGS
+	commonName                = CLIENT
+
+mv newcert.pem /config/auth/CLIENT.pem
+mv newkey.pem /config/auth/CLIENT.key
+
+openssl rsa -in /config/auth/SERVER.key -out /config/auth/SERVER-NOPASS.key
+openssl rsa -in /config/auth/CLIENT.key -out /config/auth/CLIENT-NOPASS.key
+	
+OpenVPN Interface
+==================================================
+edit interfaces openvpn vtun0
+ set mode server
+ set description OpenVPN
+ set encryption aes256
+ set hash sha256
+ set server subnet 172.16.0.0/24
+ set server push-route 10.0.0.0/24
+ set server name-server 10.0.0.100
+ 
+ set tls ca-cert-file /config/auth/cacert.pem
+ set tls cert-file /config/auth/SERVER.pem
+ set tls key-file /config/auth/SERVER-NOPASS.key
+ set tls dh-file /config/auth/DH.pem
+ set openvpn-option "--comp-lzo no"
+ 
+Firewall Rule OpenVPN
+==========================================
+edit firewall name VPN
+ set default-action drop
+ set rule 1 action accept
+ set rule 1 description OpenVPN
+ set rule 1 destination port 1194
+ set rule 1 log disable
+ set rule 1 protocol udp
+ set rule 1 source address 100.0.0.1
+  
+ set rule 2 action accept
+ set rule 2 description SSH
+ set rule 2 destination port 22
+ set rule 2 log disable
+ set rule 2 protocol tcp
+ set rule 2 source address 100.0.0.1
+
+ set rule 3 action accept
+ set rule 3 description HTTPS
+ set rule 3 destination port 443
+ set rule 3 log disable
+ set rule 3 protocol tcp
+ set rule 3 source address 100.0.0.1
+ 
+Default WAN_TO_LAN Rule
+==========================================
+edit firewall name WAN_TO_LAN 
+ set default-action drop
+ set rule 1 action accept
+ set rule 1 description Established
+ set rule 1 log disable
+ set rule 1 protocol all
+ set rule 1 state established enable
+ set rule 1 state invalid disable
+ set rule 1 state new disable
+ set rule 1 state related enable
+ 
+Apply to Interface 
+==========================================
+edit interfaces ethernet eth0
+ set firewall in name WAN_TO_LAN
+ set firewall local name VPN
+ 
+Misc Settings
+==================================================
+set service dns forwarding listen-on vtun0
+set service dns forwarding name-server 8.8.8.8
+
+Verify
+==================================================
+show openvpn status server
