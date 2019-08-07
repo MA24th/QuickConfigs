@@ -1,0 +1,85 @@
+Traffic Analysis with DPI
+|-----------------------|
+set system traffic-analysis dpi enable
+set system traffic-analysis export enable
+
+#Verify
+show ubnt offload
+
+Block Category
+|-------------|
+#See which sites are grouped under 'social networks' 
+/usr/sbin/ubnt-dpi-util show-cat-apps Social-Network
+
+#See which category a specific site is grouped under
+/usr/sbin/ubnt-dpi-util search-app facebook
+/usr/sbin/ubnt-dpi-util search-app twitter
+
+#View all categories via CLI
+set firewall name WAN_LOCAL rule 10 application category ?
+
+#View all categories via GUI
+Firewall Policies > WAN_LOCAL Actions > Advanced > Application
+
+#Drop rule for social networks
+edit firewall name SOCIAL_NETWORK
+ set default-action accept
+ set rule 10 description DROP_SOCIAL_SITES
+ set rule 10 application category Social-Network
+ set rule 10 action drop
+
+top
+ 
+#Apply to LAN interface
+set interfaces switch switch0 firewall in name SOCIAL_NETWORK
+ 
+commit
+
+Block Custom Categories
+|---------------------|
+#Combine existing applications in a custom category
+edit system traffic-analysis 
+ set custom-category BLOCKED_SITES name Facebook
+ set custom-category BLOCKED_SITES name Twitter
+
+top 
+ 
+#Drop rule for custom category
+edit firewall name SOCIAL_NETWORK
+ set default-action accept
+ set rule 10 description DROP_BLOCKED_SITES 
+ set rule 10 application category BLOCKED_SITES
+ set rule 10 action drop
+
+top
+
+#Apply to LAN interface
+set interfaces switch switch0 firewall in name BLOCKED_SITES
+ 
+commit
+
+Block Category & Allow Certain Apps
+|---------------------------------|
+#Combine existing applications in a custom category
+edit system traffic-analysis 
+ set custom-category ALLOWED_SITES name linkedin
+ set custom-category ALLOWED_SITES name yammer
+
+top 
+ 
+#Drop rule for custom category
+edit firewall name SOCIAL_NETWORK
+ set default-action accept
+ set rule 10 description ALLOWED_SOCIAL_SITES
+ set rule 10 application category ALLOWED_SITES
+ set rule 10 action accept 
+ set rule 20 description DROP_SOCIAL_SITES
+ set rule 20 application category Social-Network
+ set rule 20 action drop
+
+top
+
+#Apply to LAN interface
+set interfaces switch switch0 firewall in name SOCIAL_NETWORK
+ 
+commit
