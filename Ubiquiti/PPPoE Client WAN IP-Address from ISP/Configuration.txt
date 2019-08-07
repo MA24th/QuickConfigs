@@ -1,0 +1,23 @@
+PPPoE Client
+!----------!
+edit interfaces ethernet eth0 
+ set pppoe 0 mtu 1492
+ set pppoe 0 user-id ERX0
+ set pppoe 0 password Pa$$w0rd
+ set pppoe 0 name-server none
+ set pppoe 0 default-route none
+ set pppoe 0 firewall in name WAN_IN
+ set pppoe 0 firewall local name WAN_LOCAL
+
+set protocols static interface-route 0.0.0.0/0 next-hop-interface pppoe0
+
+set system name-server 8.8.8.8
+set system name-server 8.8.4.4
+
+set firewall options mss-clamp mss 1452
+
+Verify PPPoE Connection
+!----------------------!
+show interfaces pppoe pppoe0 log
+clear interfaces connection pppoe0
+connect interface pppoe0
