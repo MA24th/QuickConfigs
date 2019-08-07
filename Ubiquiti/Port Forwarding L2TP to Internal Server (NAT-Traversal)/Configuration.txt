@@ -1,0 +1,85 @@
+Port Forwarding
+!-------------!
+edit port-forward
+ set auto-firewall disable
+ set hairpin-nat enable
+ set lan-interface switch0
+ set wan-interface eth0
+ 
+ set rule 1 description IKE
+ set rule 1 forward-to address 192.168.1.10
+ set rule 1 forward-to port 500
+ set rule 1 original-port 500
+ set rule 1 protocol udp
+ 
+ set rule 2 description ESP
+ set rule 2 forward-to address 192.168.1.10
+ set rule 2 forward-to port 4500
+ set rule 2 original-port 4500
+ set rule 2 protocol udp
+
+top
+ 
+Firewall Entries
+!--------------!
+edit firewall name WAN_IN
+ set default-action drop
+ 
+ set rule 10 action accept
+ set rule 10 description 'Established'
+ set rule 10 log disable
+ set rule 10 protocol all
+ set rule 10 state established enable
+ set rule 10 state related enable 
+ 
+ set rule 20 action drop
+ set rule 20 description 'Invalid'
+ set rule 20 log disable
+ set rule 20 protocol all
+ set rule 20 state invalid enable
+ 
+ set rule 30 action accept
+ set rule 30 description ESP
+ set rule 30 log disable
+ set rule 30 protocol udp
+ set rule 30 destination port 4500
+
+ set rule 40 action accept
+ set rule 40 description IKE
+ set rule 40 log disable
+ set rule 40 protocol udp
+ set rule 40 destination port 500 
+ 
+top ; commit
+
+Alternatively use Destination NAT
+!-------------------------------!
+edit service nat
+ set rule 1 description IKE
+ set rule 1 destination port 500
+ set rule 1 inbound-interface eth0
+ set rule 1 inside-address address 192.168.1.10
+ set rule 1 inside-address port 500
+ set rule 1 log disable
+ set rule 1 protocol udp
+ set rule 1 type destination
+ 
+ set rule 2 description ESP
+ set rule 2 destination port 4500
+ set rule 2 inbound-interface eth0
+ set rule 2 inside-address address 192.168.1.10
+ set rule 2 inside-address port 4500
+ set rule 2 log disable
+ set rule 2 protocol udp
+ set rule 2 type destination
+
+Verify L2TP
+!---------!
+sudo tcpdump -i eth0 -n udp dst port 4500 or port 500 or port 1701
+
+show nat statistics
+show nat rules 
+
+#Zenmap for Windows
+nmap -sU -p 500 <your-wan-ipaddress>
+nmap -sU -p 4500 <your-wan-ipaddress>
