@@ -1,0 +1,9 @@
+Port Address Translation (Masquerade)
+=====================================
+edit service nat rule 5000
+ set description MASQUERADE
+ set log disable
+ set outbound-interface eth0
+ set protocol all
+ set source address 10.0.0.0/24
+ set type masquerade
