@@ -1,0 +1,45 @@
+Archival & Managing Commit
+==================================================
+edit system config-management 
+ set commit-archive location tftp://192.168.1.99/
+ set commit-revisions 5
+
+set service telnet
+commit comment ADDED_TELNET
+commit confirm 5
+
+Saving and Loading Running Configuration
+==================================================
+save
+save tftp://192.168.1.99/config.txt 
+load tftp://192.168.1.99/config.txt 
+
+TFTP backup
+==================================================
+copy file running://config/config.boot to tftp://192.168.1.99/startup-config.txt
+
+Viewing Commit Files
+==================================================
+show system commit
+show system commit file 0 
+show configuration
+
+show system commit diff 0
+
+Delete Commit History 
+==================================================
+delete file running://config/archive/config.boot.0.gz
+
+Command History
+==================================================
+show history  
+show history brief 
+
+Using the Linux Shell
+==================================================
+sudo -i
+ls -l /config/
+ls -l /config/archive
+
+cat /config/config.boot
+
