@@ -1,0 +1,13 @@
+Hardware Offloading 
+======================================
+edit system offload
+ set hwnat enable
+ set ipsec enable
+ 
+ set ipv4 forwarding enable
+ set ipv4 gre enable
+ set ipv6 forwarding enable
+ set ipv6 gre enable
+ 
+reboot
+show ubnt offload 
