@@ -1,0 +1,27 @@
+Default Logging
+==================================================
+edit system syslog
+ delete global facility protocols 
+ set global facility all level debug
+
+show log | no-more
+cat /var/log/messages
+
+sudo -i
+ls -l /var/log/
+
+Custom File Logging
+==================================================
+Stored in /var/log/user
+
+edit system syslog
+ set file AUTH facility auth level debug
+ set file ALL facility all level debug
+
+show log file AUTH 
+cat /var/log/user/AUTH
+
+Remote Syslog Logging	  
+==================================================
+edit system syslog
+  set host 192.168.1.99 facility all level debug
