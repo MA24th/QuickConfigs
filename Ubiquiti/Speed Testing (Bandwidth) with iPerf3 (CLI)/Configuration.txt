@@ -1,0 +1,54 @@
+iPerf3 Server (Receiver)
+!---------------------!
+-s = Run in server mode
+-p = Port (5201 by default)
+-f = Format
+	 k - Kbits
+	 m - Mbits
+	 K - Kytes
+	 M - MBytes
+
+#Run default	 
+iperf3 -s -f m
+
+#Listen on port 5555
+iperf3 -s -p 5555 -f m
+
+iPerf3 Client (Sender)
+!-------------------!
+-c = Run in client mode and specify remote ip
+-p = Port (5201 by default)
+-f = Format
+	 k - Kbits
+	 m - Mbits
+	 K - Kytes
+	 M - MBytes
+-P = Number of parallel streams (TCP only)
+-u = Test with UDP instead of TCP
+-i = Interval (1 second is default)
+-t = Testing time (default is 10)
+
+#Run default
+iperf3 -c 192.168.1.1 -f m
+
+#Run 5 parallel streams on port 5555
+iperf3 -c 192.168.1.1 -f m -p 5555 -P 5
+
+#Run UDP for 10 seconds with 2 second interval
+iPerf3 -c 192.168.1.1 -f m -u -i 2 -t 10
+
+Dual Bidirectional Test (iPerf2 only)
+!-----------------------!
+#First install iPerf2
+#Add the Wheezy Debian repositories
+set system package repository wheezy components 'main contrib non-free'
+set system package repository wheezy distribution wheezy 
+set system package repository wheezy url http://http.us.debian.org/debian
+
+sudo apt-get install iperf
+
+#Server
+iperf -s -f m -i 1
+
+#Client
+iperf -c 192.168.1.1 -f m -i 1 -d
