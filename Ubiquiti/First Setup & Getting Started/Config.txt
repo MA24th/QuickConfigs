@@ -1,0 +1,62 @@
+Default Login
+==================================================
+Username: ubnt
+Password: ubnt
+
+Configuration Steps
+==================================================
+1. Setup admin username and password
+2. Configure default gateway (GW) and name servers (DNS) 
+3. Configure optional system settings
+4. Setup dynamic IP (DHCP) services and interfaces
+5. Configure source NAT using masquerade (PAT)
+6. Configure firewall
+7. Associate IP addresses to WAN and LAN interfaces using DHCP or static addresses
+8. Associate firewall zones with interfaces
+
+Step 1, 2 & 3
+==================================================
+configure
+edit system
+ set gateway-address 2.0.0.2
+ set host-name EdgeRouter
+ set login user bpin level admin
+ set login user bpin authentication plaintext-password Pa$$w0rd
+ set name-server 8.8.8.8
+ set name-server 8.8.4.4
+ set time-zone Europe/Amsterdam
+
+Step 4
+==================================================
+set interfaces ethernet eth1 address 2.0.0.1/30
+
+edit service dhcp-server shared-network-name LOCAL 
+ set subnet 192.168.1.0/24 start 192.168.1.10 stop 192.168.1.150
+ set subnet 192.168.1.0/24 default-router 192.168.1.1
+ set subnet 192.168.1.0/24 dns-server 192.168.1.1
+
+Step 5
+==================================================
+edit service nat rule 5000
+ set description "MASQUERADE"
+ set log disable
+ set outbound-interface eth1
+ set protocol all
+ set type masquerade
+
+Step 6
+==================================================
+edit firewall name WAN_TO_LAN 
+ set default-action drop
+ set rule 1 action accept
+ set rule 1 description Established
+ set rule 1 log disable
+ set rule 1 protocol all
+ set rule 1 state established enable
+ set rule 1 state related enable
+ 
+Step 7 & 8
+================================================== 
+edit interfaces ethernet eth1
+ set firewall in name WAN_TO_LAN
+ set firewall local name WAN_TO_LAN
