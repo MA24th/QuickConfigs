@@ -1,0 +1,144 @@
+Temporary Management Connection (Optional)
+!----------------------------------------!
+delete interfaces switch switch0 switch-port interface eth3
+set interfaces ethernet eth3 address 172.16.0.1/24
+
+#On PC, configure static IP:
+Address	: 172.16.0.10
+Mask	: 255.255.255.0
+Gateway	: -
+
+#Patch into Eth3 and navigate to:
+https://172.16.0.1
+
+VIF & PVID Interfaces
+!-------------------!
+edit interfaces switch switch0
+ delete address 192.168.1.1/24
+ set vif 1 address 192.168.1.1/24
+ set vif 10 address 10.0.0.1/24
+ set switch-port interface eth1 vlan pvid 1
+ set switch-port interface eth2 vlan pvid 1
+ set switch-port interface eth4 vlan pvid 1
+ set switch-port interface eth4 vlan vid 10
+ set switch-port vlan-aware enable
+ set mtu 1500
+ 
+ top 
+ 
+set interfaces ethernet eth4 poe output pthru  
+
+#After config you can patch back into Eth1  
+#Set PC back to DHCP and remove Eth3 config
+
+delete interfaces ethernet eth3 address 172.16.0.1/24
+set interfaces switch switch0 switch-port interface eth3 vlan pvid 1
+
+GUEST_TO_LAN Firewall Policy
+!--------------------------!
+edit firewall group network-group LAN
+ set network 192.168.0.0/16
+ set network 172.16.0.0/12
+ set network 10.0.0.0/8
+
+top 
+ 
+edit firewall name GUEST_TO_LAN 
+ set default-action accept
+ set rule 1 action accept
+ set rule 1 description Established
+ set rule 1 log disable
+ set rule 1 protocol all
+ set rule 1 state established enable
+ set rule 1 state related enable
+
+ set rule 2 action drop
+ set rule 2 description LAN_RANGES
+ set rule 2 log disable
+ set rule 2 protocol all
+ set rule 2 destination group network-group LAN
+
+GUEST_TO_LOCAL Firewall Policy
+!----------------------------!
+edit firewall name GUEST_TO_LOCAL
+ set default-action drop
+ 
+ set rule 1 action accept
+ set rule 1 description DNS
+ set rule 1 log disable
+ set rule 1 protocol tcp_udp
+ set rule 1 destination port 53
+
+ set rule 2 action accept
+ set rule 2 description DHCP
+ set rule 2 log disable
+ set rule 2 protocol udp
+ set rule 2 destination port 67
+
+ set rule 3 action accept
+ set rule 3 description Established
+ set rule 3 log disable
+ set rule 3 protocol all
+ set rule 3 state established enable
+ set rule 3 state related enable 
+ 
+WAN_TO_LAN Firewall Policy
+!------------------------!
+edit firewall name WAN_TO_LAN 
+ set default-action drop
+ set rule 1 action accept
+ set rule 1 description Established
+ set rule 1 log disable
+ set rule 1 protocol all
+ set rule 1 state established enable
+ set rule 1 state related enable
+ 
+Apply Policies to Interfaces 
+!--------------------------!
+edit interfaces switch switch0 
+ set vif 10 firewall in name GUEST_TO_LAN 
+ set vif 10 firewall local name GUEST_TO_LOCAL
+ 
+DHCP Settings
+!-----------!
+edit service dhcp-server shared-network-name GUEST 
+ set subnet 10.0.0.0/24 default-router 10.0.0.1
+ set subnet 10.0.0.0/24 dns-server 10.0.0.1
+ set subnet 10.0.0.0/24 start 10.0.0.10 stop 10.0.0.50
+ set subnet 10.0.0.0/24 lease 86400
+ 
+edit service dhcp-server shared-network-name LAN 
+ set subnet 192.168.1.0/24 default-router 192.168.1.1
+ set subnet 192.168.1.0/24 dns-server 192.168.1.1
+ set subnet 192.168.1.0/24 start 192.168.1.38 stop 192.168.1.243
+ set subnet 192.168.1.0/24 lease 86400
+ 
+DNS Forwarding
+!------------!
+edit service dns
+ set forwarding listen-on switch0.1
+ set forwarding listen-on switch0.10
+ set forwarding cache-size 150
+ set forwarding name-server 8.8.8.8
+ 
+UniFi Configuration
+!-----------------!
+#Either use startup wizard (after install) or configure WLANs manually
+Settings > Wireless Networks > WLAN Group Default > Create New WLAN
+Name/SSID : GUEST 
+Security  : Open or WPA
+Policy    : Check or Uncheck 'Apply Guest Policies'
+VLAN	  : Use VLAN with VLAN-id 10
+
+#If you want the EdgeRouter to handle the policies (firewall rules), uncheck this
+#If you leave this checked, then you don't need the GUEST_TO_LAN and GUEST_TO_LOCAL policies above
+ 
+Name/SSID : LAN 
+Security  : WPA
+VLAN	  : No VLAN-id
+
+#Management traffic from UAPs is always untagged
+#In this case untagged traffic is put in VLAN 1 using the PVID (Native VLAN)
+
+#(Optional) Disable DHCP server on Controller
+Settings > Networks > LAN > Uncheck 'Enable DHCP Server' (USG)
