@@ -1,0 +1,89 @@
+Site-to-Site IPsec VPN
+|--------------------|
+edit vpn ipsec 
+ set auto-firewall-nat-exclude enable
+ 
+ set ike-group FOO0 lifetime 86400 
+ set ike-group FOO0 proposal 1 dh-group 14
+ set ike-group FOO0 proposal 1 encryption aes256
+ set ike-group FOO0 proposal 1 hash sha256
+ set ike-group FOO0 dead-peer-detection action restart
+ set ike-group FOO0 dead-peer-detection interval 30
+ set ike-group FOO0 dead-peer-detection timeout 120
+ 
+ set esp-group FOO0 lifetime 43200
+ set esp-group FOO0 proposal 1 encryption aes128
+ set esp-group FOO0 proposal 1 hash md5
+ set esp-group FOO0 mode tunnel
+ set esp-group FOO0 pfs disable
+  
+edit vpn ipsec site-to-site peer 2.0.0.1
+ set authentication mode pre-shared-secret 
+ set authentication pre-shared-secret Pa$$w0rd
+ set description IPsecVPN
+ set connection-type respond
+ set local-address 1.0.0.1
+ set ike-group FOO0
+ 
+ set tunnel 1 esp-group FOO0
+ set tunnel 1 local prefix 192.168.1.0/24
+ set tunnel 1 remote prefix 10.0.0.0/24
+
+Verify IPsec Tunnel
+|-----------------|
+show vpn ipsec policy 
+show vpn ipsec status
+show vpn ipsec sa
+
+sudo ipsec statusall
+
+#Logs
+show vpn log
+
+#Reset connection
+clear vpn ipsec-peer 2.0.0.1
+sudo ipsec restart
+
+#Verify StrongSwan
+cat /etc/ipsec.conf 
+
+Linux StrongSwan VPN
+|------------------|
+sudo apt-get install strongswan
+
+sudo nano /etc/ipsec.conf
+conn peer-1.0.0.1-tunnel-1
+        left=1.0.0.1
+        right=2.0.0.1
+        leftsubnet=192.168.1.0/24
+        rightsubnet=10.0.0.0/24
+        ike=aes256-sha256-modp2048!
+        keyexchange=ikev1
+        aggressive=no
+        ikelifetime=86400s
+        dpddelay=30s
+        dpdtimeout=120s
+        dpdaction=restart
+        esp=aes128-md5!
+        keylife=43200s
+        rekeymargin=540s
+        type=tunnel
+        compress=no
+        authby=secret
+        auto=route
+        keyingtries=1
+
+sudo nano /etc/ipsec.secrets
+	2.0.0.1 1.0.0.1 : PSK "Pa$$w0rd"
+
+#Enable routing between interfaces
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
+Verify IPsec Tunnel
+|-----------------|
+sudo ipsec statusall
+
+grep -a charon /var/log/auth.log
+
+#Reset connection
+sudo ipsec restart
