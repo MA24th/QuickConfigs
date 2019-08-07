@@ -1,0 +1,17 @@
+Add Speedtest Script
+!------------------!
+sudo su
+
+curl -O /config/scripts/ https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py
+
+#Make script executable
+
+chmod +x speedtest.py
+
+#Move script
+
+mv speedtest.py /config/scripts
+
+#Run script
+
+/config/scripts/speedtest.py
