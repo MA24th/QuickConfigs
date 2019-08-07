@@ -1,0 +1,103 @@
+Interfaces
+==================================================
+edit interfaces 
+ set ethernet eth0 address 2.0.0.1/24
+ set ethernet eth1 address 10.0.0.1/24
+ set ethernet eth2 address 172.16.0.1/24
+
+Zone Policies
+==================================================
+edit zone-policy
+ set zone WAN default-action drop
+ set zone WAN from LAN firewall name LAN_TO_ALL
+ set zone WAN from LOCAL firewall name LOCAL_TO_ALL
+ set zone WAN from GUEST firewall name GUEST_TO_WAN
+ set zone WAN interface eth0
+ 
+ set zone LAN default-action drop
+ set zone LAN from WAN firewall name WAN_TO_ALL
+ set zone LAN from LOCAL firewall name LOCAL_TO_ALL
+ set zone LAN from GUEST firewall name GUEST_TO_LAN
+ set zone LAN interface eth1
+
+ set zone GUEST default-action drop
+ set zone GUEST from WAN firewall name WAN_TO_ALL
+ set zone GUEST from LOCAL firewall name LOCAL_TO_ALL
+ set zone GUEST from LAN firewall name LAN_TO_ALL
+ set zone GUEST interface eth2
+ 
+ set zone LOCAL default-action drop
+ set zone LOCAL from WAN firewall name WAN_TO_ALL
+ set zone LOCAL from LAN firewall name LAN_TO_ALL
+ set zone LOCAL from GUEST firewall name GUEST_TO_LOCAL
+ set zone LOCAL local-zone 
+ 
+GUEST Firewall Policy
+==========================================
+edit firewall name GUEST_TO_LAN 
+ set default-action drop
+ 
+ set rule 1 action accept
+ set rule 1 description Established
+ set rule 1 log disable
+ set rule 1 protocol all
+ set rule 1 state established enable
+ set rule 1 state related enable
+
+edit firewall name GUEST_TO_LOCAL
+ set default-action drop
+ 
+ set rule 1 action accept
+ set rule 1 description DNS
+ set rule 1 log disable
+ set rule 1 protocol tcp_udp
+ set rule 1 destination port 53
+
+ set rule 2 action accept
+ set rule 2 description DHCP
+ set rule 2 log disable
+ set rule 2 protocol udp
+ set rule 2 destination port 67
+ 
+ set rule 3 action accept
+ set rule 3 description Established
+ set rule 3 log disable
+ set rule 3 protocol all
+ set rule 3 state established enable
+ set rule 3 state related enable
+ 
+set firewall name GUEST_TO_WAN default-action accept
+ 
+Other Firewall Rules
+==================================================
+edit firewall name WAN_TO_ALL
+ set default-action drop
+ set rule 1 action accept
+ set rule 1 description Established
+ set rule 1 log disable
+ set rule 1 protocol all
+ set rule 1 state established enable
+ set rule 1 state invalid disable
+ set rule 1 state new disable
+ set rule 1 state related enable 
+ 
+set firewall name LAN_TO_ALL default-action accept
+set firewall name LOCAL_TO_ALL default-action accept
+ 
+Misc Settings
+==================================================
+set service dns forwarding listen-on eth1
+set service dns forwarding listen-on eth2
+set service dns forwarding name-server 8.8.8.8
+
+edit service dhcp-server shared-network-name LAN 
+ set subnet 10.0.0.0/24 default-router 10.0.0.1
+ set subnet 10.0.0.0/24 start 10.0.0.10 stop 10.0.0.150
+ set subnet 10.0.0.0/24 dns-server 10.0.0.1
+ set subnet 10.0.0.0/24 lease 28800
+
+edit service dhcp-server shared-network-name GUEST 
+ set subnet 172.16.0.0/24 default-router 172.16.0.1
+ set subnet 172.16.0.0/24 start 172.16.0.10 stop 172.16.0.150
+ set subnet 172.16.0.0/24 dns-server 172.16.0.1
+ set subnet 172.16.0.0/24 lease 28800 
