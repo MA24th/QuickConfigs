@@ -1,0 +1,52 @@
+Temporary Management Connection
+!-----------------------------!
+delete interfaces switch switch0 switch-port interface eth2
+set interfaces ethernet eth2 address 172.16.0.1/24
+
+#On PC, configure static IP:
+Address	: 172.16.0.10
+Mask	: 255.255.255.0
+Gateway	: -
+
+#Patch into Eth2 and navigate to:
+https://172.16.0.1
+
+Switch0 Modification
+!------------------!
+edit interfaces switch switch0
+ delete address 192.168.1.1/24
+ set vif 1 address 192.168.1.1/24
+ set vif 10 address 10.0.0.1/24
+ set switch-port interface eth3 vlan pvid 10
+ set switch-port interface eth4 vlan pvid 1
+ set switch-port vlan-aware enable
+ set mtu 1500
+ top ; commit
+
+#On PC, change adapter back to DHCP
+#Patch into Eth3 and navigate to:
+https://10.0.0.1
+
+delete interfaces ethernet eth2 address 172.16.0.1/24
+edit interfaces switch switch0 
+ set switch-port interface eth1 vlan pvid 1 or 10
+ set switch-port interface eth2 vlan pvid 1 or 10
+ top ; commit
+ 
+Misc Settings
+!-----------!
+set service dns forwarding listen-on switch0.1
+set service dns forwarding listen-on switch0.10
+set service dns forwarding name-server 8.8.8.8
+ 
+edit service dhcp-server shared-network-name LAN 
+ set subnet 192.168.1.0/24 default-router 192.168.1.1
+ set subnet 192.168.1.0/24 dns-server 192.168.1.1
+ set subnet 192.168.1.0/24 lease 86400
+ set subnet 192.168.1.0/24 start 192.168.1.38 stop 192.168.1.243
+ 
+edit service dhcp-server shared-network-name VLAN10 
+ set subnet 10.0.0.0/24 default-router 10.0.0.1
+ set subnet 10.0.0.0/24 dns-server 10.0.0.1
+ set subnet 10.0.0.0/24 lease 86400
+ set subnet 10.0.0.0/24 start 10.0.0.38 stop 10.0.0.243
