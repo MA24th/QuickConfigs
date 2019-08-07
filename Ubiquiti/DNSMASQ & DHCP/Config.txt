@@ -1,0 +1,50 @@
+Basics
+==================================================
+edit interfaces 
+ set ethernet eth0 address dhcp
+ set ethernet eth0 description WAN
+
+ set ethernet eth1 address 10.0.0.1/24
+ set ethernet eth1 description LAN
+
+DHCP
+==================================================
+edit service dhcp-server shared-network-name LOCAL 
+ set subnet 10.0.0.0/24 start 10.0.0.10 stop 10.0.0.150
+ set subnet 10.0.0.0/24 default-router 10.0.0.1
+ set subnet 10.0.0.0/24 dns-server 10.0.0.1
+ set subnet 10.0.0.0/24 domain-name domain.local
+ set subnet 10.0.0.0/24 lease 28800
+
+Reservations
+==================================================
+edit service dhcp-server shared-network-name LOCAL  
+ set subnet 10.0.0.0/24 static-mapping HOST1 ip-address 10.0.0.199
+ set subnet 10.0.0.0/24 static-mapping HOST1 mac-address '08:00:27:85:71:5e'
+
+Manual DNS (not needed if DNSMASQ is used)
+==================================================
+edit system static-host-mapping
+ set host-name XP.domain.local inet 10.0.0.199
+ set host-name XP.domain.local alias HOST1
+ 
+DNSMASQ
+==================================================
+set interfaces ethernet eth0 dhcp-options name-server no-update
+
+set system name-server 127.0.0.1
+set system domain-name domain.local
+
+set service dns forwarding name-server 8.8.8.8
+set service dns forwarding name-server 8.8.4.4
+set service dns forwarding listen-on eth1
+set service dhcp-server use-dnsmasq enable
+ 
+Verify
+==================================================
+show dhcp leases
+show dhcp leases expired
+show dhcp statistics
+
+clear dhcp leases
+clear dhcp lease ip 10.0.0.10
