@@ -1,0 +1,23 @@
+Manual Time and Date
+=======================================
+Format = MMDDhhmmYYYY.ss
+
+set date 08271445082016.00
+
+NTP & Timezones
+=======================================
+edit system 
+ delete ntp server 0.ubnt.pool.ntp.org 
+ delete ntp server 1.ubnt.pool.ntp.org 
+ delete ntp server 2.ubnt.pool.ntp.org 
+ delete ntp server 3.ubnt.pool.ntp.org 
+ set ntp server nl.pool.ntp.org
+ 
+ set time-zone Europe/Amsterdam
+
+set date ntp
+show date
+show system uptime
+
+show ntp nl.pool.ntp.org
+show ntp
